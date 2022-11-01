@@ -2,6 +2,7 @@ package io.fair_acc.chartfx.renderer.spi.financial;
 
 import io.fair_acc.chartfx.Chart;
 import io.fair_acc.chartfx.XYChart;
+import io.fair_acc.chartfx.axes.Axis;
 import io.fair_acc.chartfx.axes.spi.CategoryAxis;
 import io.fair_acc.chartfx.renderer.Renderer;
 import io.fair_acc.chartfx.renderer.spi.financial.service.OhlcvRendererEpData;
@@ -22,6 +23,7 @@ import javafx.scene.paint.Paint;
 
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -59,7 +61,75 @@ public class CandleStickDateTimeIndexRenderer extends AbstractFinancialRenderer<
 
     public CandleStickDateTimeIndexRenderer(boolean paintVolume) {
         this.paintVolume = paintVolume;
-        this.findAreaDistances = paintVolume ? new XMinVolumeMaxAreaDistances() : new XMinAreaDistances();
+        this.findAreaDistances = paintVolume ? new XMinVolumeMaxAreaDistances() {
+            @Override
+            public double[] findAreaDistances(DataSet dataset, Axis xAxis, Axis yAxis, double xmin, double xmax) {
+                // get most popular are distance
+                double[] xminAreaDistances = new XMinAreaDistances() {
+                    @Override
+                    public double[] findAreaDistances(DataSet dataset, Axis xAxis, Axis yAxis, double xmin, double xmax) {
+                        int imin = (int)xmin; //dataset.getIndex(DataSet.DIM_X, xmin) + 1;
+                        int imax = (int)xmax; // Math.min(dataset.getIndex(DataSet.DIM_X, xmax) + 1, dataset.getDataCount());
+                        int diff = imax - imin;
+                        int incr = diff > 30 ? (int) Math.round(Math.floor(diff / 30.0)) : 1;
+                        List<Double> distances = new ArrayList<>();
+                        for (int i = imin; i < imax; i = i + incr) {
+                            //final double param0 = xAxis.getDisplayPosition(dataset.get(DataSet.DIM_X, i - 1));
+                            //final double param1 = xAxis.getDisplayPosition(dataset.get(DataSet.DIM_X, i));
+                            final double param0 = xAxis.getDisplayPosition(i);
+                            final double param1 = xAxis.getDisplayPosition(i+1);
+                            if (param0 != param1) {
+                                distances.add(Math.abs(param1 - param0));
+                            }
+                        }
+                        double popularDistance = 0.0;
+                        if (!distances.isEmpty()) {
+                            Collections.sort(distances);
+                            popularDistance = getMostPopularElement(distances);
+                        }
+                        return new double[] { popularDistance };
+                    }
+
+                }.findAreaDistances(dataset, xAxis, yAxis, xmin, xmax);
+                // find max volume
+                double maxVolume = Double.MIN_VALUE;
+                int imin = (int)xmin; // dataset.getIndex(DataSet.DIM_X, xmin) + 1;
+                int imax = (int)xmax; // Math.min(dataset.getIndex(DataSet.DIM_X, xmax) + 1, dataset.getDataCount());
+                for (int i = imin; i < imax && i<dataset.getDataCount()-1; i++) {
+                    double volume = dataset.get(OhlcvDataSet.DIM_Y_VOLUME, i);
+                    if (maxVolume < volume) {
+                        maxVolume = volume;
+                    }
+                }
+                return new double[] { xminAreaDistances[0], maxVolume };
+            }
+
+        } : new XMinAreaDistances() {
+            @Override
+            public double[] findAreaDistances(DataSet dataset, Axis xAxis, Axis yAxis, double xmin, double xmax) {
+                int imin = (int)xmin; //dataset.getIndex(DataSet.DIM_X, xmin) + 1;
+                int imax = (int)xmax; // Math.min(dataset.getIndex(DataSet.DIM_X, xmax) + 1, dataset.getDataCount());
+                int diff = imax - imin;
+                int incr = diff > 30 ? (int) Math.round(Math.floor(diff / 30.0)) : 1;
+                List<Double> distances = new ArrayList<>();
+                for (int i = imin; i < imax; i = i + incr) {
+                    //final double param0 = xAxis.getDisplayPosition(dataset.get(DataSet.DIM_X, i - 1));
+                    //final double param1 = xAxis.getDisplayPosition(dataset.get(DataSet.DIM_X, i));
+                    final double param0 = xAxis.getDisplayPosition(i);
+                    final double param1 = xAxis.getDisplayPosition(i+1);
+                    if (param0 != param1) {
+                        distances.add(Math.abs(param1 - param0));
+                    }
+                }
+                double popularDistance = 0.0;
+                if (!distances.isEmpty()) {
+                    Collections.sort(distances);
+                    popularDistance = getMostPopularElement(distances);
+                }
+                return new double[] { popularDistance };
+            }
+
+        };
     }
 
     public CandleStickDateTimeIndexRenderer() {

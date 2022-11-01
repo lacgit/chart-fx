@@ -309,7 +309,7 @@ public abstract class AbstractBasicFinancialApplication extends Application {
         final DefaultIndexAxis xAxis1 = new DefaultIndexAxis("time", "iso");
         xAxis1.setOverlapPolicy(AxisLabelOverlapPolicy.SKIP_ALT);
         xAxis1.setAutoRangeRounding(false);
-        xAxis1.setTimeAxis(true);
+        xAxis1.setTimeAxis(false);
 
         // set localised time offset
         if (xAxis1.isTimeAxis() && xAxis1.getAxisLabelFormatter() instanceof DefaultTimeIndexFormatter) {
