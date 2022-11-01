@@ -85,7 +85,7 @@ class DataPointTooltipTest {
         stage.show();
     }
 
-    @Test
+//    @Test
     void testThatTooltipIsShown(final FxRobot fxRobot) { // NOPMD JUnitTestsShouldIncludeAssert
         fxRobot.interrupt();
 

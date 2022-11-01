@@ -10,6 +10,8 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Map;
 
+import io.fair_acc.chartfx.axes.spi.DefaultIndexAxis;
+import io.fair_acc.chartfx.axes.spi.format.DefaultTimeIndexFormatter;
 import io.fair_acc.financial.samples.service.consolidate.OhlcvConsolidationAddon;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -67,8 +69,8 @@ public abstract class AbstractBasicFinancialApplication extends Application {
 
     protected int prefChartWidth = 640; //1024
     protected int prefChartHeight = 480; //768
-    protected int prefSceneWidth = 1920;
-    protected int prefSceneHeight = 1080;
+    protected int prefSceneWidth = 1440;
+    protected int prefSceneHeight = 960;
 
     private final double UPDATE_PERIOD = 10.0; // replay multiple
     protected int DEBUG_UPDATE_RATE = 500;
@@ -270,6 +272,90 @@ public abstract class AbstractBasicFinancialApplication extends Application {
         return chart;
     }
 
+    /**
+     * Default financial datetime index chart configuration
+     *
+     * @param theme defines theme which has to be used for sample app
+     */
+    protected Chart getDefaultFinancialDateTimeIndexTestChart(final String theme) {
+        // load datasets
+        DefaultDataSet indiSet = null;
+        if (resource.startsWith("REALTIME")) {
+            try {
+                Interval<Calendar> timeRangeInt = CalendarUtils.createByDateTimeInterval(timeRange);
+                Interval<Calendar> ttInt = CalendarUtils.createByTimeInterval(tt);
+                Calendar replayFromCal = CalendarUtils.createByDateTime(replayFrom);
+                ohlcvDataSet = new SimpleOhlcvReplayDataSet(
+                        DataInput.valueOf(resource.substring("REALTIME-".length())),
+                        period,
+                        timeRangeInt,
+                        ttInt,
+                        replayFromCal,
+                        consolidationAddons);
+            } catch (ParseException e) {
+                throw new IllegalArgumentException(e.getMessage(), e);
+            }
+        } else {
+            ohlcvDataSet = new OhlcvDataSet(resource);
+            indiSet = new DefaultDataSet("MA(24)");
+            try {
+                loadTestData(resource, ohlcvDataSet, indiSet);
+            } catch (IOException e) {
+                throw new IllegalArgumentException(e.getMessage(), e);
+            }
+        }
+
+        // prepare axis
+        final DefaultIndexAxis xAxis1 = new DefaultIndexAxis("time", "iso");
+        xAxis1.setOverlapPolicy(AxisLabelOverlapPolicy.SKIP_ALT);
+        xAxis1.setAutoRangeRounding(false);
+        xAxis1.setTimeAxis(true);
+
+        // set localised time offset
+        if (xAxis1.isTimeAxis() && xAxis1.getAxisLabelFormatter() instanceof DefaultTimeIndexFormatter) {
+            final DefaultTimeIndexFormatter axisFormatter = (DefaultTimeIndexFormatter) xAxis1.getAxisLabelFormatter();
+            axisFormatter.setTimeZoneOffset(ZoneOffset.ofHoursMinutes(2, 0));
+        }
+
+        // category axis support tests
+        //final CategoryAxis xAxis = new CategoryAxis("time [iso]");
+        //xAxis.setTickLabelRotation(90);
+        //xAxis.setOverlapPolicy(AxisLabelOverlapPolicy.SKIP_ALT);
+
+        final DefaultNumericAxis yAxis1 = new DefaultNumericAxis("price", "points");
+
+        // prepare chart structure
+        final XYChart chart = new XYChart(xAxis1, yAxis1);
+        chart.setTitle(theme);
+        chart.setLegendVisible(true);
+        chart.setPrefSize(prefChartWidth, prefChartHeight);
+        // set them false to make the plot faster
+        chart.setAnimated(false);
+
+        // prepare plugins
+        chart.getPlugins().add(new Zoomer(AxisMode.X));
+        chart.getPlugins().add(new EditAxis());
+        chart.getPlugins().add(new DataPointTooltip());
+
+        // basic chart financial structure style
+        chart.getGridRenderer().setDrawOnTop(false);
+        yAxis1.setAutoRangeRounding(true);
+        yAxis1.setSide(Side.RIGHT);
+
+        // prepare financial renderers
+        prepareRenderers(chart, ohlcvDataSet, indiSet);
+
+        // apply color scheme
+        applyColorScheme(theme, chart);
+
+        // zoom to specific time range
+        if (timeRange != null) {
+            showPredefinedTimeIndexRange(timeRange, ohlcvDataSet, xAxis1, yAxis1);
+        }
+
+        return chart;
+    }
+
     protected void applyColorScheme(String theme, XYChart chart) {
         try {
             financialColorScheme.applyTo(theme, chart);
@@ -307,6 +393,45 @@ public abstract class AbstractBasicFinancialApplication extends Application {
                 }
             }
             xaxis.set(fromTime, toTime);
+            yaxis.set(min, max);
+
+            xaxis.setAutoRanging(false);
+            yaxis.setAutoRanging(false);
+
+        } catch (ParseException e) {
+            throw new IllegalArgumentException(e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Show required part of the OHLC resource
+     *
+     * @param dateIntervalPattern from to pattern for time range
+     * @param ohlcvDataSet domain object with filled ohlcv data
+     * @param xaxis X-axis for settings
+     * @param yaxis Y-axis for settings
+     */
+    protected void showPredefinedTimeIndexRange(String dateIntervalPattern, OhlcvDataSet ohlcvDataSet,
+                                           DefaultIndexAxis xaxis, DefaultNumericAxis yaxis) {
+        try {
+            Interval<Calendar> fromTo = CalendarUtils.createByDateTimeInterval(dateIntervalPattern);
+            double fromTime = fromTo.from.getTime().getTime() / 1000.0;
+            double toTime = fromTo.to.getTime().getTime() / 1000.0;
+
+            int fromIdx = ohlcvDataSet.getXIndex(fromTime);
+            int toIdx = ohlcvDataSet.getXIndex(toTime);
+            double min = Double.MAX_VALUE;
+            double max = Double.MIN_VALUE;
+            for (int i = fromIdx; i <= toIdx; i++) {
+                IOhlcvItem ohlcvItem = ohlcvDataSet.getItem(i);
+                if (max < ohlcvItem.getHigh()) {
+                    max = ohlcvItem.getHigh();
+                }
+                if (min > ohlcvItem.getLow()) {
+                    min = ohlcvItem.getLow();
+                }
+            }
+            xaxis.set(fromIdx, toIdx);
             yaxis.set(min, max);
 
             xaxis.setAutoRanging(false);
