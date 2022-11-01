@@ -69,8 +69,8 @@ public abstract class AbstractBasicFinancialApplication extends Application {
 
     protected int prefChartWidth = 640; //1024
     protected int prefChartHeight = 480; //768
-    protected int prefSceneWidth = 1440;
-    protected int prefSceneHeight = 960;
+    protected int prefSceneWidth = 1024;
+    protected int prefSceneHeight = 800;
 
     private final double UPDATE_PERIOD = 10.0; // replay multiple
     protected int DEBUG_UPDATE_RATE = 500;
