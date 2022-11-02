@@ -3,6 +3,7 @@ package io.fair_acc.financial.samples;
 import io.fair_acc.chartfx.XYChart;
 import io.fair_acc.chartfx.renderer.ErrorStyle;
 import io.fair_acc.chartfx.renderer.spi.ErrorDataSetRenderer;
+import io.fair_acc.chartfx.renderer.spi.financial.AbstractFinancialIndexRenderer;
 import io.fair_acc.chartfx.renderer.spi.financial.AbstractFinancialRenderer;
 import io.fair_acc.chartfx.renderer.spi.financial.CandleStickDateTimeIndexRenderer;
 import io.fair_acc.chartfx.renderer.spi.financial.CandleStickRenderer;
@@ -35,7 +36,7 @@ public class FinancialAdvancedCandlestickDateTimeIndexSample extends AbstractBas
         timeRange = "2020/06/24 0:00-2020/11/12 0:00";
 
         final var chart = getDefaultFinancialDateTimeIndexTestChart(FinancialColorSchemeConstants.SAND);
-        final AbstractFinancialRenderer<?> renderer = (AbstractFinancialRenderer<?>) chart.getRenderers().get(0);
+        final AbstractFinancialIndexRenderer<?> renderer = (AbstractFinancialIndexRenderer<?>) chart.getRenderers().get(0);
 
         // prepare top financial toolbar
         var testVariableToolBar = getTestToolBar(chart, renderer, false);

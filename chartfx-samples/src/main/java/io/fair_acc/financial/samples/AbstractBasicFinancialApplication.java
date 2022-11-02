@@ -12,6 +12,7 @@ import java.util.Map;
 
 import io.fair_acc.chartfx.axes.spi.DefaultIndexAxis;
 import io.fair_acc.chartfx.axes.spi.format.DefaultTimeIndexFormatter;
+import io.fair_acc.chartfx.renderer.spi.financial.AbstractFinancialIndexRenderer;
 import io.fair_acc.financial.samples.service.consolidate.OhlcvConsolidationAddon;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -131,6 +132,49 @@ public abstract class AbstractBasicFinancialApplication extends Application {
     }
 
     protected ToolBar getTestToolBar(Chart chart, AbstractFinancialRenderer<?> renderer, boolean replaySupport) {
+        ToolBar testVariableToolBar = new ToolBar();
+        localRange.setSelected(renderer.computeLocalRange());
+        localRange.setTooltip(new Tooltip("select for auto-adjusting min/max the y-axis (prices)"));
+        localRange.selectedProperty().bindBidirectional(renderer.computeLocalRangeProperty());
+        localRange.selectedProperty().addListener((ch, old, selection) -> {
+            for (ChartPlugin plugin : chart.getPlugins()) {
+                if (plugin instanceof Zoomer) {
+                    ((Zoomer) plugin).setAxisMode(selection ? AxisMode.X : AxisMode.XY);
+                }
+            }
+            chart.requestLayout();
+        });
+
+        Button periodicTimer = null;
+        if (replaySupport) {
+            // repetitively generate new data
+            periodicTimer = new Button("replay");
+            periodicTimer.setTooltip(new Tooltip("replay instrument data in realtime"));
+            periodicTimer.setOnAction(evt -> {
+                pauseResumeTimer();
+            });
+
+            updatePeriod.valueProperty().addListener((ch, o, n) -> updateTimer());
+            updatePeriod.setEditable(true);
+            updatePeriod.setPrefWidth(80);
+        }
+
+        final ProfilerInfoBox profilerInfoBox = new ProfilerInfoBox(DEBUG_UPDATE_RATE);
+        profilerInfoBox.setDebugLevel(VERSION);
+
+        final Pane spacer = new Pane();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        if (replaySupport) {
+            testVariableToolBar.getItems().addAll(localRange, periodicTimer, updatePeriod, new Label("[multiply]"), spacer, profilerInfoBox);
+        } else {
+            testVariableToolBar.getItems().addAll(localRange, spacer, profilerInfoBox);
+        }
+
+        return testVariableToolBar;
+    }
+
+    protected ToolBar getTestToolBar(Chart chart, AbstractFinancialIndexRenderer<?> renderer, boolean replaySupport) {
         ToolBar testVariableToolBar = new ToolBar();
         localRange.setSelected(renderer.computeLocalRange());
         localRange.setTooltip(new Tooltip("select for auto-adjusting min/max the y-axis (prices)"));

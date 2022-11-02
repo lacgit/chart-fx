@@ -7,6 +7,7 @@ import static io.fair_acc.financial.samples.service.period.IntradayPeriod.Intrad
 import java.util.ArrayList;
 import java.util.List;
 
+import io.fair_acc.chartfx.renderer.spi.financial.AbstractFinancialIndexRenderer;
 import javafx.geometry.HPos;
 import javafx.scene.Scene;
 import javafx.scene.control.ToolBar;
@@ -81,7 +82,7 @@ public class FinancialRealtimeCandlestickSample extends AbstractBasicFinancialAp
         orders.add(new SimMktOrder("2016/07/29 18:40", 1));
 
         final Chart chart = getDefaultFinancialTestChart(theme);
-        final AbstractFinancialRenderer<?> renderer = (AbstractFinancialRenderer<?>) chart.getRenderers().get(0);
+        final AbstractFinancialIndexRenderer<?> renderer = (AbstractFinancialIndexRenderer<?>) chart.getRenderers().get(0);
 
         chart.setTitle(title);
 

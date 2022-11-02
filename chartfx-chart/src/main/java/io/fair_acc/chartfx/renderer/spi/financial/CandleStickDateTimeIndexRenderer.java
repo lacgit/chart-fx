@@ -53,7 +53,7 @@ import static io.fair_acc.dataset.DataSet.DIM_X;
  */
 @SuppressWarnings({ "PMD.ExcessiveMethodLength", "PMD.NPathComplexity", "PMD.ExcessiveParameterList" })
 // designated purpose of this class
-public class CandleStickDateTimeIndexRenderer extends AbstractFinancialRenderer<CandleStickDateTimeIndexRenderer> implements Renderer, RendererPaintAfterEPAware {
+public class CandleStickDateTimeIndexRenderer extends AbstractFinancialIndexRenderer<CandleStickDateTimeIndexRenderer> implements Renderer, RendererPaintAfterEPAware {
     private final boolean paintVolume;
     private final FindAreaDistances findAreaDistances;
 
