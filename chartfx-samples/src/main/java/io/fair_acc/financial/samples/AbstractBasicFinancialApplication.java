@@ -2,17 +2,22 @@ package io.fair_acc.financial.samples;
 
 import static io.fair_acc.chartfx.renderer.spi.financial.css.FinancialColorSchemeConstants.getDefaultColorSchemes;
 import static io.fair_acc.chartfx.ui.ProfilerInfoBox.DebugLevel.VERSION;
+import static io.fair_acc.dataset.DataSet.DIM_X;
+import static java.lang.String.format;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Map;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
 
+import io.fair_acc.chartfx.axes.spi.CategoryAxis;
 import io.fair_acc.chartfx.axes.spi.DefaultIndexAxis;
 import io.fair_acc.chartfx.axes.spi.format.DefaultTimeIndexFormatter;
 import io.fair_acc.chartfx.renderer.spi.financial.AbstractFinancialIndexRenderer;
+import io.fair_acc.chartfx.samples.CategoryAxisSample;
 import io.fair_acc.financial.samples.service.consolidate.OhlcvConsolidationAddon;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -270,6 +275,98 @@ public abstract class AbstractBasicFinancialApplication extends Application {
         xAxis1.setOverlapPolicy(AxisLabelOverlapPolicy.SKIP_ALT);
         xAxis1.setAutoRangeRounding(false);
         xAxis1.setTimeAxis(true);
+
+        // set localised time offset
+        if (xAxis1.isTimeAxis() && xAxis1.getAxisLabelFormatter() instanceof DefaultTimeFormatter) {
+            final DefaultTimeFormatter axisFormatter = (DefaultTimeFormatter) xAxis1.getAxisLabelFormatter();
+            axisFormatter.setTimeZoneOffset(ZoneOffset.ofHoursMinutes(2, 0));
+        }
+
+        // category axis support tests
+        //final CategoryAxis xAxis = new CategoryAxis("time [iso]");
+        //xAxis.setTickLabelRotation(90);
+        //xAxis.setOverlapPolicy(AxisLabelOverlapPolicy.SKIP_ALT);
+
+        final DefaultNumericAxis yAxis1 = new DefaultNumericAxis("price", "points");
+
+        // prepare chart structure
+        final XYChart chart = new XYChart(xAxis1, yAxis1);
+        chart.setTitle(theme);
+        chart.setLegendVisible(true);
+        chart.setPrefSize(prefChartWidth, prefChartHeight);
+        // set them false to make the plot faster
+        chart.setAnimated(false);
+
+        // prepare plugins
+        chart.getPlugins().add(new Zoomer(AxisMode.X));
+        chart.getPlugins().add(new EditAxis());
+        chart.getPlugins().add(new DataPointTooltip());
+
+        // basic chart financial structure style
+        chart.getGridRenderer().setDrawOnTop(false);
+        yAxis1.setAutoRangeRounding(true);
+        yAxis1.setSide(Side.RIGHT);
+
+        // prepare financial renderers
+        prepareRenderers(chart, ohlcvDataSet, indiSet);
+
+        // apply color scheme
+        applyColorScheme(theme, chart);
+
+        // zoom to specific time range
+        if (timeRange != null) {
+            showPredefinedTimeRange(timeRange, ohlcvDataSet, xAxis1, yAxis1);
+        }
+
+        return chart;
+    }
+
+    /**
+     * Default financial chart configuration
+     *
+     * @param theme defines theme which has to be used for sample app
+     */
+    protected Chart getDefaultFinancialDateTimeCategoryTestChart(final String theme) {
+        // load datasets
+        DefaultDataSet indiSet = null;
+        if (resource.startsWith("REALTIME")) {
+            try {
+                Interval<Calendar> timeRangeInt = CalendarUtils.createByDateTimeInterval(timeRange);
+                Interval<Calendar> ttInt = CalendarUtils.createByTimeInterval(tt);
+                Calendar replayFromCal = CalendarUtils.createByDateTime(replayFrom);
+                ohlcvDataSet = new SimpleOhlcvReplayDataSet(
+                        DataInput.valueOf(resource.substring("REALTIME-".length())),
+                        period,
+                        timeRangeInt,
+                        ttInt,
+                        replayFromCal,
+                        consolidationAddons);
+            } catch (ParseException e) {
+                throw new IllegalArgumentException(e.getMessage(), e);
+            }
+        } else {
+            ohlcvDataSet = new OhlcvDataSet(resource);
+            indiSet = new DefaultDataSet("MA(24)");
+            try {
+                loadTestData(resource, ohlcvDataSet, indiSet);
+                ohlcvDataSet.setCategoryBased(true);
+            } catch (IOException e) {
+                throw new IllegalArgumentException(e.getMessage(), e);
+            }
+        }
+
+        // prepare axis
+        final CategoryAxis xAxis1 = new CategoryAxis("time");
+        xAxis1.setOverlapPolicy(AxisLabelOverlapPolicy.SKIP_ALT);
+        xAxis1.setAutoRangeRounding(false);
+        xAxis1.setTimeAxis(true);
+        List<String> dtCategories = new ArrayList<>();
+        for (int i=0; i<ohlcvDataSet.getDataCount(); i++) {
+            double dtDbl = ohlcvDataSet.get(DIM_X, i);
+            dtCategories.add(format("%f", dtDbl));
+        }
+        xAxis1.setCategories(dtCategories);
+
 
         // set localised time offset
         if (xAxis1.isTimeAxis() && xAxis1.getAxisLabelFormatter() instanceof DefaultTimeFormatter) {

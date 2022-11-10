@@ -192,6 +192,17 @@ public final class CategoryAxis extends DefaultNumericAxis {
         return false;
     }
 
+    /*
+    protected double getDisplayPosition(String value) {
+        for (int i=0; i<getCategories().size(); i++) {
+            if (value.equalsIgnoreCase(value)) {
+                return getDisplayPositionImpl(value);
+            }
+        }
+        return 0;
+    }
+     */
+
     @Override
     protected AxisRange autoRange(final double minValue, final double maxValue, final double length,
             final double labelSize) {
