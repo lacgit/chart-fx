@@ -166,10 +166,10 @@ public class CandleStickDateTimeCategoryRenderer extends AbstractFinancialRender
                 double shadowTransPercent = StyleParser.getFloatingDecimalPropertyValue(style, DATASET_SHADOW_TRANSPOSITION_PERCENT, 0.5d);
 
                 if (ds.getDataCount() > 0) {
-                    int iMin = ds.getIndex(DIM_X, xmin);
+                    int iMin = (int)xmin;
                     if (iMin < 0)
                         iMin = 0;
-                    int iMax = Math.min(ds.getIndex(DIM_X, xmax) + 1, ds.getDataCount());
+                    int iMax = (int)Math.min(xmax + 1, ds.getDataCount());
 
                     double[] distances = null;
                     var minRequiredWidth = 0.0;
@@ -181,7 +181,7 @@ public class CandleStickDateTimeCategoryRenderer extends AbstractFinancialRender
                     double barWidthHalf = localBarWidth / 2.0;
 
                     for (int i = iMin; i < iMax; i++) {
-                        double x0 = xAxis.getDisplayPosition(ds.get(DIM_X, i));
+                        double x0 = xAxis.getDisplayPosition(i);
                         double yOpen = yAxis.getDisplayPosition(ds.get(OhlcvDataSet.DIM_Y_OPEN, i));
                         double yHigh = yAxis.getDisplayPosition(ds.get(OhlcvDataSet.DIM_Y_HIGH, i));
                         double yLow = yAxis.getDisplayPosition(ds.get(OhlcvDataSet.DIM_Y_LOW, i));
