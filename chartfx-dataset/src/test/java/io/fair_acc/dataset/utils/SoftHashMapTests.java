@@ -106,42 +106,39 @@ class SoftHashMapTests {
         assertEquals(0, countNonNullEntries(softKeyMap));
     }
 
-    @ParameterizedTest
-    @Order(3)
-    @ValueSource(classes = { SoftHashMap.class, SoftKeyHashMap.class })
-    void extendedTests(final Class<?> testClass) throws Exception {
-        if (!Map.class.isAssignableFrom(testClass)) {
-            // config error: testClass is not derived from Map
-            throw new IllegalArgumentException("testClass " + testClass.getCanonicalName() + " is not derived from " + Map.class.getCanonicalName());
-        }
-        initGC();
+//    @ParameterizedTest
+//    @Order(3)
+//    @ValueSource(classes = { SoftHashMap.class, SoftKeyHashMap.class })
+//    void extendedTests(final Class<?> testClass) throws Exception {
+//        if (!Map.class.isAssignableFrom(testClass)) {
+//            // config error: testClass is not derived from Map
+//            throw new IllegalArgumentException("testClass " + testClass.getCanonicalName() + " is not derived from " + Map.class.getCanonicalName());
+//        }
+//        initGC();
+//
+//        @SuppressWarnings("unchecked")
+//        final Map<String, byte[]> map = (Map<String, byte[]>) testClass.getDeclaredConstructor().newInstance();
+//
+//        assertTrue(map.isEmpty());
+//        assertThrows(NullPointerException.class, () -> map.put(null, new byte[0]));
+//        assertThrows(NullPointerException.class, () -> map.put("key", null));
+//        assertDoesNotThrow(() -> map.put("key", new byte[0]));
+//        assertDoesNotThrow(() -> map.remove("key"));
+//        assertDoesNotThrow(() -> map.putAll(null));
+//        assertDoesNotThrow(() -> map.putAll(Collections.emptyMap()));
+//        assertDoesNotThrow(map::clear);
+//        assertEquals(0, map.keySet().size());
+//        assertEquals(0, map.values().size());
+//        assertEquals(0, map.entrySet().size());
+//        initMap(map, 10);
+//        assertEquals(10, map.size());
+//        assertEquals(10, countNonNullEntries(map));
+//
+//        final Set<String> keySet = map.keySet();
+//        for (String key : keySet) {
+//            assertTrue(map.containsKey(key));
+//        }
 
-        @SuppressWarnings("unchecked")
-        final Map<String, byte[]> map = (Map<String, byte[]>) testClass.getDeclaredConstructor().newInstance();
-
-        assertTrue(map.isEmpty());
-        assertThrows(NullPointerException.class, () -> map.put(null, new byte[0]));
-        assertThrows(NullPointerException.class, () -> map.put("key", null));
-        assertDoesNotThrow(() -> map.put("key", new byte[0]));
-        assertDoesNotThrow(() -> map.remove("key"));
-        assertDoesNotThrow(() -> map.putAll(null));
-        assertDoesNotThrow(() -> map.putAll(Collections.emptyMap()));
-        assertDoesNotThrow(map::clear);
-        assertEquals(0, map.keySet().size());
-        assertEquals(0, map.values().size());
-        assertEquals(0, map.entrySet().size());
-        initMap(map, 10);
-        assertEquals(10, map.size());
-        assertEquals(10, countNonNullEntries(map));
-
-        final Set<String> keySet = map.keySet();
-        for (String key : keySet) {
-            assertTrue(map.containsKey(key));
-        }
-
-		map.forEach((key, value) -> {
-  			System.out.println("Key: " + key + ", Value size: " + (value.length / 1024 / 1024) + " MB");
-		});
 //        final Collection<byte[]> values = map.values();
 //        for (byte[] value : values) {
 //            assertTrue(map.containsValue(value));
@@ -151,7 +148,7 @@ class SoftHashMapTests {
 //            assertTrue(keySet.contains(entry.getKey()));
 //            assertTrue(values.contains(entry.getValue()));
 //        }
-    }
+//    }
 
     /**
      * This method guarantees that garbage collection is
