@@ -24,7 +24,7 @@ import java.util.Calendar;
  *
  * @author afischer
  */
-public class FinancialDateCategoryCandlestickSample extends AbstractBasicDateCategoryApplication {
+public class FinancialCategoryCandlestickSample extends AbstractBasicDateCategoryApplication {
     public static final AttributeKey<Boolean> MARK_BAR = AttributeKey.create(Boolean.class, "MARK_BAR");
 
     /**
@@ -34,7 +34,7 @@ public class FinancialDateCategoryCandlestickSample extends AbstractBasicDateCat
     public Node getChartPanel(Stage stage) {
         timeRange = "2020/06/24 0:00-2020/11/12 0:00";
 
-        final var chart = getDefaultFinancialTestChart(FinancialTheme.Sand);
+        final var chart = getDefaultFinancialTestChart(FinancialTheme.Clearlook);
         final AbstractFinancialRenderer<?> renderer = (AbstractFinancialRenderer<?>) chart.getRenderers().get(0);
 
         // prepare top financial toolbar
