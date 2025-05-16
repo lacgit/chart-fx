@@ -32,7 +32,7 @@ public class FinancialCategoryCandlestickSample extends AbstractBasicFinancialCa
      */
     @Override
     public Node getChartPanel(Stage stage) {
-        timeRange = "2020/06/24 0:00-2020/11/12 0:00";
+        timeRange = "2025/05/12 09:00-2025/05/13 16:30";
 
         final var chart = getDefaultFinancialTestChart(FinancialTheme.Clearlook);
         final AbstractFinancialRenderer<?> renderer = (AbstractFinancialRenderer<?>) chart.getRenderers().get(0);
