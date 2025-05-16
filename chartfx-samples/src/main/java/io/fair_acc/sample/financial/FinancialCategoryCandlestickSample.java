@@ -24,7 +24,7 @@ import java.util.Calendar;
  *
  * @author afischer
  */
-public class FinancialCategoryCandlestickSample extends AbstractBasicDateCategoryApplication {
+public class FinancialCategoryCandlestickSample extends AbstractBasicFinancialCategoryApplication {
     public static final AttributeKey<Boolean> MARK_BAR = AttributeKey.create(Boolean.class, "MARK_BAR");
 
     /**

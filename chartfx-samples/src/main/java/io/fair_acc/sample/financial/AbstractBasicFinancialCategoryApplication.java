@@ -5,6 +5,7 @@ import io.fair_acc.chartfx.XYChart;
 import io.fair_acc.chartfx.axes.AxisLabelOverlapPolicy;
 import io.fair_acc.chartfx.axes.AxisMode;
 import io.fair_acc.chartfx.axes.spi.DefaultNumericAxis;
+import io.fair_acc.chartfx.axes.spi.FinancialCategoryAxis;
 import io.fair_acc.chartfx.axes.spi.format.DefaultTimeFormatter;
 import io.fair_acc.chartfx.plugins.ChartPlugin;
 import io.fair_acc.chartfx.plugins.DataPointTooltip;
@@ -28,6 +29,8 @@ import io.fair_acc.sample.financial.service.SimpleOhlcvReplayDataSet.DataInput;
 import io.fair_acc.sample.financial.service.consolidate.OhlcvConsolidationAddon;
 import io.fair_acc.sample.financial.service.period.IntradayPeriod;
 import javafx.application.Application;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
@@ -42,10 +45,10 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.ZoneOffset;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Map;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 import static io.fair_acc.chartfx.ui.ProfilerInfoBox.DebugLevel.VERSION;
 
@@ -56,8 +59,8 @@ import static io.fair_acc.chartfx.ui.ProfilerInfoBox.DebugLevel.VERSION;
  *
  * @author afischer
  */
-public abstract class AbstractBasicDateCategoryApplication extends ChartSample {
-    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractBasicDateCategoryApplication.class);
+public abstract class AbstractBasicFinancialCategoryApplication extends ChartSample {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractBasicFinancialCategoryApplication.class);
 
     protected int prefChartWidth = 640; // 1024
     protected int prefChartHeight = 480; // 768
@@ -211,7 +214,12 @@ public abstract class AbstractBasicDateCategoryApplication extends ChartSample {
         }
 
         // prepare axis
-        final DefaultNumericAxis xAxis1 = new DefaultNumericAxis("time", "iso");
+        final ObservableList<String> categories = FXCollections.observableArrayList();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        for (IOhlcvItem ohlcvItem : ohlcvDataSet) {
+            categories.add(sdf.format(ohlcvItem.getTimeStamp()));
+        }
+        final FinancialCategoryAxis xAxis1 = new FinancialCategoryAxis("time", categories);
         xAxis1.setOverlapPolicy(AxisLabelOverlapPolicy.SKIP_ALT);
         xAxis1.setAutoRangeRounding(false);
         xAxis1.setTimeAxis(true);
@@ -270,7 +278,7 @@ public abstract class AbstractBasicDateCategoryApplication extends ChartSample {
      * @param yaxis Y-axis for settings
      */
     protected void showPredefinedTimeRange(String dateIntervalPattern, OhlcvDataSet ohlcvDataSet,
-            DefaultNumericAxis xaxis, DefaultNumericAxis yaxis) {
+            FinancialCategoryAxis xaxis, DefaultNumericAxis yaxis) {
         try {
             Interval<Calendar> fromTo = CalendarUtils.createByDateTimeInterval(dateIntervalPattern);
             double fromTime = fromTo.from.getTime().getTime() / 1000.0;

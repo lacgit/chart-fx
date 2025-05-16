@@ -192,7 +192,7 @@ public final class FinancialCategoryAxis extends DefaultFinancialAxis {
             isUpdating = false;
         }
         final double max = maxValue < 0 && isForceZeroInRange() ? 0 : maxValue;
-        final double padding = DefaultNumericAxis.getEffectiveRange(min, max) * getAutoRangePadding();
+        final double padding = FinancialCategoryAxis.getEffectiveRange(min, max) * getAutoRangePadding();
         final double paddingScale = 1.0 + getAutoRangePadding();
         // compared to DefaultNumericAxis clamping wasn't really necessary for
         // CategoryAxis
