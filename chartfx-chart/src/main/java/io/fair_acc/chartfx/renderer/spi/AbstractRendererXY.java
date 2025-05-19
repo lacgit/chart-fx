@@ -2,6 +2,7 @@ package io.fair_acc.chartfx.renderer.spi;
 
 import java.security.InvalidParameterException;
 
+import io.fair_acc.chartfx.axes.spi.FinancialCategoryAxis;
 import javafx.geometry.Orientation;
 import javafx.scene.canvas.GraphicsContext;
 
@@ -93,6 +94,9 @@ public abstract class AbstractRendererXY<R extends AbstractRendererXY<R>> extend
         // For backwards compatibility: A CategoryAxis without explicitly set
         // categories copies the labels of the first dataset that is using it.
         if (xAxis instanceof CategoryAxis axis && !getDatasets().isEmpty()) {
+            axis.updateCategories(getDatasets().get(0));
+        }
+        if (xAxis instanceof FinancialCategoryAxis axis && !getDatasets().isEmpty()) {
             axis.updateCategories(getDatasets().get(0));
         }
         if (yAxis instanceof CategoryAxis axis && !getDatasets().isEmpty()) {
