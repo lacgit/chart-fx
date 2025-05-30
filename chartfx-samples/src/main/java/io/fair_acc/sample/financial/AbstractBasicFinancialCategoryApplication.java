@@ -21,8 +21,10 @@ import io.fair_acc.dataset.spi.financial.api.ohlcv.IOhlcv;
 import io.fair_acc.dataset.spi.financial.api.ohlcv.IOhlcvItem;
 import io.fair_acc.dataset.utils.ProcessingProfiler;
 import io.fair_acc.sample.chart.ChartSample;
+import io.fair_acc.sample.financial.dos.CategoryOhlcv;
 import io.fair_acc.sample.financial.dos.Interval;
 import io.fair_acc.sample.financial.service.CalendarUtils;
+import io.fair_acc.sample.financial.service.CategoryOhlcvDailyParser;
 import io.fair_acc.sample.financial.service.SimpleOhlcvDailyParser;
 import io.fair_acc.sample.financial.service.SimpleOhlcvReplayDataSet;
 import io.fair_acc.sample.financial.service.SimpleOhlcvReplayDataSet.DataInput;
@@ -319,7 +321,7 @@ public abstract class AbstractBasicFinancialCategoryApplication extends ChartSam
     protected void loadTestData(String data, final OhlcvDataSet dataSet, DefaultDataSet indiSet) throws IOException {
         final long startTime = ProcessingProfiler.getTimeStamp();
 
-        IOhlcv ohlcv = new SimpleOhlcvDailyParser().getContinuousOHLCV(data);
+        IOhlcv ohlcv = new CategoryOhlcvDailyParser().getContinuousOHLCV(data);
         dataSet.setData(ohlcv);
 
         DescriptiveStatistics stats = new DescriptiveStatistics(24);
