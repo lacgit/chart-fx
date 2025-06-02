@@ -402,6 +402,9 @@ public class DefaultFinancialAxis extends AbstractAxis implements Axis {
         if  (index<0) {
             index = 0;
         }
+        if  (index>=ohlcvDataSet.getDataCount()) {
+            index = ohlcvDataSet.getDataCount()-1;
+        }
         double dt =  ohlcvDataSet.getItem(index).getTimeStamp().getTime()/1000;
         return dt;
     }
