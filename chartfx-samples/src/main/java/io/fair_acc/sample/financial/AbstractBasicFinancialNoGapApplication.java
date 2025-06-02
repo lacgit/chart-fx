@@ -4,8 +4,8 @@ import io.fair_acc.chartfx.Chart;
 import io.fair_acc.chartfx.XYChart;
 import io.fair_acc.chartfx.axes.AxisLabelOverlapPolicy;
 import io.fair_acc.chartfx.axes.AxisMode;
+import io.fair_acc.chartfx.axes.spi.DefaultFinancialAxis;
 import io.fair_acc.chartfx.axes.spi.DefaultNumericAxis;
-import io.fair_acc.chartfx.axes.spi.FinancialCategoryAxis;
 import io.fair_acc.chartfx.axes.spi.format.DefaultTimeFormatter;
 import io.fair_acc.chartfx.plugins.ChartPlugin;
 import io.fair_acc.chartfx.plugins.DataPointTooltip;
@@ -21,12 +21,8 @@ import io.fair_acc.dataset.spi.financial.api.ohlcv.IOhlcv;
 import io.fair_acc.dataset.spi.financial.api.ohlcv.IOhlcvItem;
 import io.fair_acc.dataset.utils.ProcessingProfiler;
 import io.fair_acc.sample.chart.ChartSample;
-import io.fair_acc.sample.financial.dos.CategoryOhlcv;
 import io.fair_acc.sample.financial.dos.Interval;
-import io.fair_acc.sample.financial.service.CalendarUtils;
-import io.fair_acc.sample.financial.service.CategoryOhlcvDailyParser;
-import io.fair_acc.sample.financial.service.SimpleOhlcvDailyParser;
-import io.fair_acc.sample.financial.service.SimpleOhlcvReplayDataSet;
+import io.fair_acc.sample.financial.service.*;
 import io.fair_acc.sample.financial.service.SimpleOhlcvReplayDataSet.DataInput;
 import io.fair_acc.sample.financial.service.consolidate.OhlcvConsolidationAddon;
 import io.fair_acc.sample.financial.service.period.IntradayPeriod;
@@ -49,7 +45,6 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import static io.fair_acc.chartfx.ui.ProfilerInfoBox.DebugLevel.VERSION;
@@ -61,8 +56,8 @@ import static io.fair_acc.chartfx.ui.ProfilerInfoBox.DebugLevel.VERSION;
  *
  * @author afischer
  */
-public abstract class AbstractBasicFinancialCategoryApplication extends ChartSample {
-    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractBasicFinancialCategoryApplication.class);
+public abstract class AbstractBasicFinancialNoGapApplication extends ChartSample {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractBasicFinancialNoGapApplication.class);
 
     protected int prefChartWidth = 640; // 1024
     protected int prefChartHeight = 480; // 768
@@ -74,7 +69,7 @@ public abstract class AbstractBasicFinancialCategoryApplication extends ChartSam
 
     protected String title; // application title
     protected FinancialTheme theme = FinancialTheme.Sand;
-    protected String resource = "@ES-[TF1D]";
+    protected String resource = "@HS-[TF1]";
     protected String timeRange = "2020/08/24 0:00-2020/11/12 0:00";
     protected String tt;
     protected String replayFrom;
@@ -221,7 +216,7 @@ public abstract class AbstractBasicFinancialCategoryApplication extends ChartSam
         for (IOhlcvItem ohlcvItem : ohlcvDataSet) {
             categories.add(sdf.format(ohlcvItem.getTimeStamp()));
         }
-        final FinancialCategoryAxis xAxis1 = new FinancialCategoryAxis("time", categories);
+        final DefaultFinancialAxis xAxis1 = new DefaultFinancialAxis("time", "iso", ohlcvDataSet);
         xAxis1.setOverlapPolicy(AxisLabelOverlapPolicy.SKIP_ALT);
         xAxis1.setAutoRangeRounding(false);
         xAxis1.setTimeAxis(true);
@@ -280,7 +275,7 @@ public abstract class AbstractBasicFinancialCategoryApplication extends ChartSam
      * @param yaxis Y-axis for settings
      */
     protected void showPredefinedTimeRange(String dateIntervalPattern, OhlcvDataSet ohlcvDataSet,
-            FinancialCategoryAxis xaxis, DefaultNumericAxis yaxis) {
+            DefaultFinancialAxis xaxis, DefaultNumericAxis yaxis) {
         try {
             Interval<Calendar> fromTo = CalendarUtils.createByDateTimeInterval(dateIntervalPattern);
             double fromTime = fromTo.from.getTime().getTime() / 1000.0;
@@ -321,7 +316,7 @@ public abstract class AbstractBasicFinancialCategoryApplication extends ChartSam
     protected void loadTestData(String data, final OhlcvDataSet dataSet, DefaultDataSet indiSet) throws IOException {
         final long startTime = ProcessingProfiler.getTimeStamp();
 
-        IOhlcv ohlcv = new CategoryOhlcvDailyParser().getContinuousOHLCV(data);
+        IOhlcv ohlcv = new SimpleOhlcvMinuteParser().getContinuousOHLCV(data);
         dataSet.setData(ohlcv);
 
         DescriptiveStatistics stats = new DescriptiveStatistics(24);

@@ -9,6 +9,7 @@ import io.fair_acc.chartfx.axes.spi.transforms.LogarithmicAxisTransform;
 import io.fair_acc.chartfx.axes.spi.transforms.LogarithmicTimeAxisTransform;
 import io.fair_acc.chartfx.utils.PropUtil;
 import io.fair_acc.dataset.spi.fastutil.DoubleArrayList;
+import io.fair_acc.dataset.spi.financial.OhlcvDataSet;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -76,6 +77,8 @@ public class DefaultFinancialAxis extends AbstractAxis implements Axis {
         });
     }
 
+    private OhlcvDataSet  ohlcvDataSet;
+
     /**
      * Creates an {@link #autoRangingProperty() auto-ranging} Axis.
      */
@@ -132,8 +135,9 @@ public class DefaultFinancialAxis extends AbstractAxis implements Axis {
      * @param axisLabel the axis {@link #nameProperty() label}
      * @param unit the unit of the axis axis {@link #unitProperty() label}
      */
-    public DefaultFinancialAxis(final String axisLabel, final String unit) {
+    public DefaultFinancialAxis(final String axisLabel, final String unit, final OhlcvDataSet ohlcvDataSet) {
         this(axisLabel, 0.0, 0.0, 5.0);
+        this.ohlcvDataSet = ohlcvDataSet;
         setUnit(unit);
     }
 
@@ -225,6 +229,18 @@ public class DefaultFinancialAxis extends AbstractAxis implements Axis {
             return getValueForDisplayImpl(offset - displayPosition);
         }
         return getValueForDisplayImpl(displayPosition);
+    }
+
+    @Override
+    protected double calculateNewScale(final double length, final double lowerBound, final double upperBound) {
+        double dLowIndex = ohlcvDataSet.getXIndex(lowerBound);
+        double dUpIndex = ohlcvDataSet.getXIndex(upperBound);
+        final double range = dUpIndex - dLowIndex;
+        final double scale = (range == 0) ? length : length / range;
+        if (scale == 0) {
+            return -1; // covers inf range input
+        }
+        return getSide().isVertical() ? -scale : scale;
     }
 
     /**
@@ -364,9 +380,12 @@ public class DefaultFinancialAxis extends AbstractAxis implements Axis {
             return valueLogOffset * cache.logScaleLengthInv;
         }
 
+        int index = ohlcvDataSet.getXIndex(value);
+        double  dIndex = (double) index;
+
         // default case: linear axis computation (dependent variables are being cached for performance reasons)
         // return cache.localOffset + (value - cache.localCurrentLowerBound) * cache.localScale;
-        return cache.localOffset2 + value * cache.localScale;
+        return cache.localOffset2 + dIndex * cache.localScale;
     }
 
     private double getValueForDisplayImpl(final double displayPosition) {
@@ -378,7 +397,13 @@ public class DefaultFinancialAxis extends AbstractAxis implements Axis {
             return axisTransform.backward(cache.lowerBoundLog + displayPosition / cache.axisLength * cache.logScaleLength);
         }
 
-        return cache.localCurrentLowerBound + (displayPosition - cache.localOffset) / cache.localScale;
+        double dIndex = cache.localCurrentLowerBound + (displayPosition - cache.localOffset) / cache.localScale;
+        int index = (int) dIndex;
+        if  (index<0) {
+            index = 0;
+        }
+        double dt =  ohlcvDataSet.getItem(index).getTimeStamp().getTime()/1000;
+        return dt;
     }
 
     @Override
@@ -582,8 +607,10 @@ public class DefaultFinancialAxis extends AbstractAxis implements Axis {
 
         private void updateCachedAxisVariables() {
             axisLength = getLength();
-            localCurrentLowerBound = DefaultFinancialAxis.super.getMin();
-            localCurrentUpperBound = DefaultFinancialAxis.super.getMax();
+            //localCurrentLowerBound = DefaultFinancialAxis.super.getMin();
+            //localCurrentUpperBound = DefaultFinancialAxis.super.getMax();
+            localCurrentLowerBound = ohlcvDataSet == null ? - Double.MAX_VALUE : 0.0;
+            localCurrentUpperBound = ohlcvDataSet == null ? Double.MAX_VALUE : ohlcvDataSet.getDataCount();
 
             upperBoundLog = axisTransform.forward(getMax());
             lowerBoundLog = axisTransform.forward(getMin());
@@ -592,7 +619,8 @@ public class DefaultFinancialAxis extends AbstractAxis implements Axis {
             logScaleLengthInv = 1.0 / logScaleLength;
 
             localScale = scaleProperty().get();
-            final double zero = DefaultFinancialAxis.super.getDisplayPosition(0);
+            //final double zero = DefaultFinancialAxis.super.getDisplayPosition(0);
+            final double zero = getDisplayPosition(0);
             localOffset = zero + localCurrentLowerBound * localScale;
             localOffset2 = localOffset - cache.localCurrentLowerBound * cache.localScale;
 

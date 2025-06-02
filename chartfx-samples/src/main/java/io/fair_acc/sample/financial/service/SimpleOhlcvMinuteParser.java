@@ -21,7 +21,7 @@ import java.util.stream.Stream;
  *
  * @author afischer
  */
-public class CategoryOhlcvDailyParser {
+public class SimpleOhlcvMinuteParser {
     private static final String CHART_SAMPLE_PATH = StreamUtils.CLASSPATH_PREFIX + "io/fair_acc/sample/chart/financial/%s.csv";
 
     private static final ConcurrentDateFormatAccess dateFormatParsing = new ConcurrentDateFormatAccess("yyyy-MM-dd HH:mm:ss");
