@@ -77,11 +77,13 @@ public abstract class AbstractBasicFinancialNoGapApplication extends ChartSample
     protected String resource = "@ES-[TF1D]";
     protected String datePattern = "MM/dd/yyyy";
     protected String timeRange = "2020/01/24 0:00-2020/11/12 0:00";
+    protected int zoneOffsetHr = 2;
      */
 
     protected String resource = "@HS-[TF1]";
     protected String datePattern = "yyyy-MM-dd";
     protected String timeRange = "2025/05/13 09:00-2025/05/13 16:30";
+    protected int zoneOffsetHr = 8;
     protected String replayFrom;
     protected IntradayPeriod period;
     protected OhlcvDataSet ohlcvDataSet;
@@ -229,7 +231,7 @@ public abstract class AbstractBasicFinancialNoGapApplication extends ChartSample
         // set localised time offset
         if (xAxis1.isTimeAxis() && xAxis1.getAxisLabelFormatter() instanceof DefaultTimeFormatter) {
             final DefaultTimeFormatter axisFormatter = (DefaultTimeFormatter) xAxis1.getAxisLabelFormatter();
-            axisFormatter.setTimeZoneOffset(ZoneOffset.ofHoursMinutes(2, 0));
+            axisFormatter.setTimeZoneOffset(ZoneOffset.ofHoursMinutes(zoneOffsetHr, 0));
         }
 
         // category axis support tests
