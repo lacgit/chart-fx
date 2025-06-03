@@ -55,11 +55,10 @@ import io.fair_acc.sample.financial.service.period.IntradayPeriod;
 import fxsampler.SampleBase;
 
 /**
- * Base class for demonstration of financial charts.
- * This abstract class assemblies and configures important chart components and elements for financial charts.
- * Any part can be overridden and modified for final Sample test.
+ * A replicate of {@link AbstractBasicFinancialApplication}.
+ * It uses {@link DefaultFinancialAxis} instead of {@link DefaultNumericAxis}.
  *
- * @author afischer
+ * @author lacgit
  */
 public abstract class AbstractBasicFinancialNoGapApplication extends ChartSample {
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractBasicFinancialNoGapApplication.class);
