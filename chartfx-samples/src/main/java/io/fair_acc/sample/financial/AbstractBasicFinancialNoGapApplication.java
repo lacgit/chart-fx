@@ -211,11 +211,6 @@ public abstract class AbstractBasicFinancialNoGapApplication extends ChartSample
         }
 
         // prepare axis
-        final ObservableList<String> categories = FXCollections.observableArrayList();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-        for (IOhlcvItem ohlcvItem : ohlcvDataSet) {
-            categories.add(sdf.format(ohlcvItem.getTimeStamp()));
-        }
         final DefaultFinancialAxis xAxis1 = new DefaultFinancialAxis("time", "iso", ohlcvDataSet);
         xAxis1.setOverlapPolicy(AxisLabelOverlapPolicy.SKIP_ALT);
         xAxis1.setAutoRangeRounding(false);
