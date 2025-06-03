@@ -17,15 +17,21 @@ import java.util.List;
 import java.util.stream.Stream;
 
 /**
- * Simple Tradestation OHLC data parser.
+ * Replicate of {@link SimpleOhlcvDailyParser}.
+ * Allow handle different date format.
  *
- * @author afischer
+ * @author lacgit
  */
 public class SimpleOhlcvMinuteParser {
     private static final String CHART_SAMPLE_PATH = StreamUtils.CLASSPATH_PREFIX + "io/fair_acc/sample/chart/financial/%s.csv";
 
-    private static final ConcurrentDateFormatAccess dateFormatParsing = new ConcurrentDateFormatAccess("yyyy-MM-dd HH:mm:ss");
-    private static final ConcurrentDateFormatAccess olderDateFormatParsing = new ConcurrentDateFormatAccess("yyyy-MM-dd HH:mm:ss");
+    private static ConcurrentDateFormatAccess dateFormatParsing;
+    private static ConcurrentDateFormatAccess olderDateFormatParsing;
+
+    public SimpleOhlcvMinuteParser(String datePattern) {
+        dateFormatParsing = new ConcurrentDateFormatAccess(datePattern + " HH:mm:ss");
+        olderDateFormatParsing = new ConcurrentDateFormatAccess(datePattern + "HHmm");
+    }
 
     public IOhlcv getContinuousOHLCV(String future) throws IOException, NumberFormatException {
         String resource = String.format(CHART_SAMPLE_PATH, future);
