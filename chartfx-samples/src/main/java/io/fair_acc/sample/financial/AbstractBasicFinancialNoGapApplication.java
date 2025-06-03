@@ -73,10 +73,15 @@ public abstract class AbstractBasicFinancialNoGapApplication extends ChartSample
 
     protected String title; // application title
     protected FinancialTheme theme = FinancialTheme.Sand;
+    /*
+    protected String resource = "@ES-[TF1D]";
+    protected String datePattern = "MM/dd/yyyy";
+    protected String timeRange = "2020/01/24 0:00-2020/11/12 0:00";
+     */
+
     protected String resource = "@HS-[TF1]";
     protected String datePattern = "yyyy-MM-dd";
-    protected String timeRange = "2020/08/24 0:00-2020/11/12 0:00";
-    protected String tt;
+    protected String timeRange = "2025/05/13 09:00-2025/05/13 16:30";
     protected String replayFrom;
     protected IntradayPeriod period;
     protected OhlcvDataSet ohlcvDataSet;
@@ -193,7 +198,7 @@ public abstract class AbstractBasicFinancialNoGapApplication extends ChartSample
         if (resource.startsWith("REALTIME")) {
             try {
                 Interval<Calendar> timeRangeInt = CalendarUtils.createByDateTimeInterval(timeRange);
-                Interval<Calendar> ttInt = CalendarUtils.createByTimeInterval(tt);
+                Interval<Calendar> ttInt = CalendarUtils.createByTimeInterval(timeRange);
                 Calendar replayFromCal = CalendarUtils.createByDateTime(replayFrom);
                 ohlcvDataSet = new SimpleOhlcvReplayDataSet(
                         DataInput.valueOf(resource.substring("REALTIME-".length())),

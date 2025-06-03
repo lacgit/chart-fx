@@ -1,5 +1,14 @@
 package io.fair_acc.sample.financial;
 
+import java.util.Calendar;
+
+import javafx.application.Application;
+import javafx.scene.Node;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.stage.Stage;
+
 import io.fair_acc.chartfx.XYChart;
 import io.fair_acc.chartfx.renderer.ErrorStyle;
 import io.fair_acc.chartfx.renderer.spi.ErrorDataSetRenderer;
@@ -10,14 +19,6 @@ import io.fair_acc.dataset.spi.DefaultDataSet;
 import io.fair_acc.dataset.spi.financial.OhlcvDataSet;
 import io.fair_acc.dataset.spi.financial.api.attrs.AttributeKey;
 import io.fair_acc.dataset.spi.financial.api.ohlcv.IOhlcvItem;
-import javafx.application.Application;
-import javafx.scene.Node;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.stage.Stage;
-
-import java.util.Calendar;
 
 /**
  * Advanced configuration of Candlestick renderer. Support for PaintBars and extension points.
@@ -32,7 +33,6 @@ public class FinancialNoGapCandlestickSample extends AbstractBasicFinancialNoGap
      */
     @Override
     public Node getChartPanel(Stage stage) {
-        timeRange = "2025/05/12 09:00-2025/05/13 16:30";
 
         final var chart = getDefaultFinancialTestChart(FinancialTheme.Clearlook);
         final AbstractFinancialRenderer<?> renderer = (AbstractFinancialRenderer<?>) chart.getRenderers().get(0);
