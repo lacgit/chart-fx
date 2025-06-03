@@ -1,5 +1,13 @@
 package io.fair_acc.chartfx.axes.spi;
 
+import io.fair_acc.dataset.spi.financial.OhlcvDataSet;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.fair_acc.chartfx.axes.Axis;
 import io.fair_acc.chartfx.axes.AxisTransform;
 import io.fair_acc.chartfx.axes.LogAxisType;
@@ -9,27 +17,39 @@ import io.fair_acc.chartfx.axes.spi.transforms.LogarithmicAxisTransform;
 import io.fair_acc.chartfx.axes.spi.transforms.LogarithmicTimeAxisTransform;
 import io.fair_acc.chartfx.utils.PropUtil;
 import io.fair_acc.dataset.spi.fastutil.DoubleArrayList;
-import io.fair_acc.dataset.spi.financial.OhlcvDataSet;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.scene.chart.NumberAxis;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import java.awt.*;
+import java.util.Date;
 
 /**
- * A axis class that plots a range of numbers with major tick marks every "tickUnit". You can use any Number type with
- * this axis, Long, Double, BigDecimal etc.
+ * A axis class that plots a range of dates with major tick marks every TODO:"tickUnit".
+ * To be consistent with the library, it was decided to use Date instead of the more modern LocalDateTime.
  * <p>
- * Compared to the {@link NumberAxis}, this one has a few additional features:
+ * Compared to the {@link DefaultNumericAxis} this one changes
  * <ul>
- * <li>Re-calculates tick unit also when the {@link #autoRangingProperty() auto-ranging} is off</li>
- * <li>Supports configuration of {@link #autoRangePaddingProperty() auto-range padding}</li>
- * <li>Supports configuration of {@link #autoRangeRoundingProperty() auto-range rounding}</li>
- * <li>Supports custom {@code tickUnitSupplierProperty} tick unit suppliers</li>
+ * <li>{@link #getDisplayPositionImpl(double)}, and</li>
+ * <li>{@link #getValueForDisplayImpl(double)} using the index to</li>
+ * <li>{@link #ohlcvDataSet} instead of the milli-seconds from timestamp</li>
+ * <li>And overridden {@link #calculateNewScale(double, double, double)}</li>
+ *
+ * It was decided to replicate {@link DefaultNumericAxis} instead of extending it because
+ * {@link #getDisplayPositionImpl(double)} and {@link #getValueForDisplayImpl(double)}
+ * were private and cannot be overridden.
+ *
+ * It was also decided to use {@link OhlcvDataSet} instead of {@link List<Date>} to reuse
+ * the retrieve dates using double as indices.
+ *
+ * For situations when an {@link OhlcvDataSet} might have missing datetime item will be handle
+ * separately.
+ *
+ * TODO: 1. Handle overlapping tick marks at the end-beginning of time gaps,
+ *       2. Scrolling sometimes failed, still need to identify root causes.
+ *       3. Tick marks missing after selection, but will reappear after slight scrolling.
+ *       4. Handle log time scale?  Not sure has any practical value or not. Gaps may not
+ *          be relevant if really needed.
  * </ul>
  *
- * @author rstein
+ * @author lacgit
  */
 public class DefaultFinancialAxis extends AbstractAxis implements Axis {
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultFinancialAxis.class);
@@ -77,7 +97,7 @@ public class DefaultFinancialAxis extends AbstractAxis implements Axis {
         });
     }
 
-    private OhlcvDataSet  ohlcvDataSet;
+    private OhlcvDataSet ohlcvDataSet;
 
     /**
      * Creates an {@link #autoRangingProperty() auto-ranging} Axis.
@@ -380,8 +400,7 @@ public class DefaultFinancialAxis extends AbstractAxis implements Axis {
             return valueLogOffset * cache.logScaleLengthInv;
         }
 
-        int index = ohlcvDataSet.getXIndex(value);
-        double  dIndex = (double) index;
+        double  dIndex = (double)(ohlcvDataSet.getXIndex(value));
 
         // default case: linear axis computation (dependent variables are being cached for performance reasons)
         // return cache.localOffset + (value - cache.localCurrentLowerBound) * cache.localScale;
@@ -397,16 +416,14 @@ public class DefaultFinancialAxis extends AbstractAxis implements Axis {
             return axisTransform.backward(cache.lowerBoundLog + displayPosition / cache.axisLength * cache.logScaleLength);
         }
 
-        double dIndex = cache.localCurrentLowerBound + (displayPosition - cache.localOffset) / cache.localScale;
-        int index = (int) dIndex;
+        int index = (int)(cache.localCurrentLowerBound + (displayPosition - cache.localOffset) / cache.localScale);
         if  (index<0) {
             index = 0;
         }
         if  (index>=ohlcvDataSet.getDataCount()) {
             index = ohlcvDataSet.getDataCount()-1;
         }
-        double dt =  ohlcvDataSet.getItem(index).getTimeStamp().getTime()/1000;
-        return dt;
+        return ohlcvDataSet.getItem(index).getTimeStamp().getTime()/1000.0;
     }
 
     @Override
@@ -610,10 +627,8 @@ public class DefaultFinancialAxis extends AbstractAxis implements Axis {
 
         private void updateCachedAxisVariables() {
             axisLength = getLength();
-            //localCurrentLowerBound = DefaultFinancialAxis.super.getMin();
-            //localCurrentUpperBound = DefaultFinancialAxis.super.getMax();
-            localCurrentLowerBound = ohlcvDataSet == null ? - Double.MAX_VALUE : 0.0;
-            localCurrentUpperBound = ohlcvDataSet == null ? Double.MAX_VALUE : ohlcvDataSet.getDataCount();
+            localCurrentLowerBound = DefaultFinancialAxis.super.getMin();
+            localCurrentUpperBound = DefaultFinancialAxis.super.getMax();
 
             upperBoundLog = axisTransform.forward(getMax());
             lowerBoundLog = axisTransform.forward(getMin());
@@ -622,7 +637,7 @@ public class DefaultFinancialAxis extends AbstractAxis implements Axis {
             logScaleLengthInv = 1.0 / logScaleLength;
 
             localScale = scaleProperty().get();
-            //final double zero = DefaultFinancialAxis.super.getDisplayPosition(0);
+            //  zero position of dates is the first date in the array.
             final double zero = getDisplayPosition(0);
             localOffset = zero + localCurrentLowerBound * localScale;
             localOffset2 = localOffset - cache.localCurrentLowerBound * cache.localScale;
