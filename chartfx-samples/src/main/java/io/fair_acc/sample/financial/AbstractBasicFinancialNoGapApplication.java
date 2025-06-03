@@ -1,10 +1,32 @@
 package io.fair_acc.sample.financial;
 
+import static io.fair_acc.chartfx.ui.ProfilerInfoBox.DebugLevel.VERSION;
+
+import java.io.IOException;
+import java.text.ParseException;
+import java.time.ZoneOffset;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Map;
+
+import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.layout.*;
+import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
+
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.fair_acc.chartfx.Chart;
 import io.fair_acc.chartfx.XYChart;
 import io.fair_acc.chartfx.axes.AxisLabelOverlapPolicy;
 import io.fair_acc.chartfx.axes.AxisMode;
-import io.fair_acc.chartfx.axes.spi.DefaultFinancialAxis;
 import io.fair_acc.chartfx.axes.spi.DefaultNumericAxis;
 import io.fair_acc.chartfx.axes.spi.format.DefaultTimeFormatter;
 import io.fair_acc.chartfx.plugins.ChartPlugin;
@@ -22,32 +44,15 @@ import io.fair_acc.dataset.spi.financial.api.ohlcv.IOhlcvItem;
 import io.fair_acc.dataset.utils.ProcessingProfiler;
 import io.fair_acc.sample.chart.ChartSample;
 import io.fair_acc.sample.financial.dos.Interval;
-import io.fair_acc.sample.financial.service.*;
+import io.fair_acc.sample.financial.service.CalendarUtils;
+import io.fair_acc.chartfx.axes.spi.DefaultFinancialAxis;
+import io.fair_acc.sample.financial.service.SimpleOhlcvMinuteParser;
+import io.fair_acc.sample.financial.service.SimpleOhlcvReplayDataSet;
 import io.fair_acc.sample.financial.service.SimpleOhlcvReplayDataSet.DataInput;
 import io.fair_acc.sample.financial.service.consolidate.OhlcvConsolidationAddon;
 import io.fair_acc.sample.financial.service.period.IntradayPeriod;
-import javafx.application.Application;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.geometry.Pos;
-import javafx.scene.Node;
-import javafx.scene.control.*;
-import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.Priority;
-import javafx.stage.Stage;
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.ZoneOffset;
-import java.util.*;
-
-import static io.fair_acc.chartfx.ui.ProfilerInfoBox.DebugLevel.VERSION;
+import fxsampler.SampleBase;
 
 /**
  * Base class for demonstration of financial charts.
@@ -70,6 +75,7 @@ public abstract class AbstractBasicFinancialNoGapApplication extends ChartSample
     protected String title; // application title
     protected FinancialTheme theme = FinancialTheme.Sand;
     protected String resource = "@HS-[TF1]";
+    protected String datePattern = "yyyy-MM-dd";
     protected String timeRange = "2020/08/24 0:00-2020/11/12 0:00";
     protected String tt;
     protected String replayFrom;
@@ -311,7 +317,7 @@ public abstract class AbstractBasicFinancialNoGapApplication extends ChartSample
     protected void loadTestData(String data, final OhlcvDataSet dataSet, DefaultDataSet indiSet) throws IOException {
         final long startTime = ProcessingProfiler.getTimeStamp();
 
-        IOhlcv ohlcv = new SimpleOhlcvMinuteParser().getContinuousOHLCV(data);
+        IOhlcv ohlcv = new SimpleOhlcvMinuteParser(datePattern).getContinuousOHLCV(data);
         dataSet.setData(ohlcv);
 
         DescriptiveStatistics stats = new DescriptiveStatistics(24);
