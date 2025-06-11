@@ -278,7 +278,7 @@ public class DefaultFinancialAxis extends AbstractAxis implements Axis {
             return Double.NaN;
         }
 
-        return getDisplayPosition(0);
+        return getDisplayPosition(cache.localCurrentLowerBound);
     }
 
     /**
@@ -400,7 +400,7 @@ public class DefaultFinancialAxis extends AbstractAxis implements Axis {
             return valueLogOffset * cache.logScaleLengthInv;
         }
 
-        double  dIndex = (double)(ohlcvDataSet.getXIndex(value));
+        double  dIndex = ohlcvDataSet.getXIndex(value);
 
         // default case: linear axis computation (dependent variables are being cached for performance reasons)
         // return cache.localOffset + (value - cache.localCurrentLowerBound) * cache.localScale;
@@ -416,7 +416,7 @@ public class DefaultFinancialAxis extends AbstractAxis implements Axis {
             return axisTransform.backward(cache.lowerBoundLog + displayPosition / cache.axisLength * cache.logScaleLength);
         }
 
-        int index = (int)(cache.localCurrentLowerBound + (displayPosition - cache.localOffset) / cache.localScale);
+        int index = (int)(cache.localCurrentLowerIndex + ((displayPosition - cache.localOffset) / cache.localScale));
         if  (index<0) {
             index = 0;
         }
@@ -616,6 +616,8 @@ public class DefaultFinancialAxis extends AbstractAxis implements Axis {
         protected double localScale;
         protected double localCurrentLowerBound;
         protected double localCurrentUpperBound;
+        protected double localCurrentLowerIndex;
+        protected double localCurrentUpperIndex;
         protected double localOffset;
         protected double localOffset2;
         protected double upperBoundLog;
@@ -629,6 +631,10 @@ public class DefaultFinancialAxis extends AbstractAxis implements Axis {
             axisLength = getLength();
             localCurrentLowerBound = DefaultFinancialAxis.super.getMin();
             localCurrentUpperBound = DefaultFinancialAxis.super.getMax();
+            //localCurrentLowerBound = ohlcvDataSet.getItem(0).getTimeStamp().getTime()/1000.0;
+            //localCurrentUpperBound = ohlcvDataSet.getLastItem().getTimeStamp().getTime()/1000.0;
+            localCurrentLowerIndex = ohlcvDataSet.getXIndex(localCurrentLowerBound);
+            localCurrentUpperIndex = ohlcvDataSet.getXIndex(localCurrentUpperBound);
 
             upperBoundLog = axisTransform.forward(getMax());
             lowerBoundLog = axisTransform.forward(getMin());
@@ -638,9 +644,9 @@ public class DefaultFinancialAxis extends AbstractAxis implements Axis {
 
             localScale = scaleProperty().get();
             //  zero position of dates is the first date in the array.
-            final double zero = getDisplayPosition(0);
-            localOffset = zero + localCurrentLowerBound * localScale;
-            localOffset2 = localOffset - cache.localCurrentLowerBound * cache.localScale;
+            final double zero = (0 - localCurrentLowerIndex) * localScale;
+            localOffset = zero + localCurrentLowerIndex * localScale;
+            localOffset2 = localOffset - cache.localCurrentLowerIndex * cache.localScale;
 
             if (getSide() != null) {
                 isVerticalAxis = getSide().isVertical();
