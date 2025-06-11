@@ -43,9 +43,8 @@ import java.util.Date;
  * separately.
  *
  * TODO: 1. Handle overlapping tick marks at the end-beginning of time gaps,
- *       2. Scrolling sometimes failed, still need to identify root causes.
- *       3. Tick marks missing after selection, but will reappear after slight scrolling.
- *       4. Handle log time scale?  Not sure has any practical value or not. Gaps may not
+ *       2. Scrolling start working, still sometime seems "non-linear", may be wrong scaling
+ *       3. Handle log time scale?  Not sure has any practical value or not. Gaps may not
  *          be relevant if really needed.
  * </ul>
  *
