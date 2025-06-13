@@ -1,5 +1,6 @@
 package io.fair_acc.chartfx.axes.spi;
 
+import io.fair_acc.chartfx.axes.spi.format.FinancialTickUnitSupplier;
 import io.fair_acc.dataset.spi.financial.OhlcvDataSet;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
@@ -564,7 +565,8 @@ public class DefaultFinancialAxis extends AbstractAxis implements Axis {
     }
 
     protected double computeTickUnit(final double rawTickUnit) {
-        final TickUnitSupplier unitSupplier = getAxisLabelFormatter().getTickUnitSupplier();
+        //final TickUnitSupplier unitSupplier = getAxisLabelFormatter().getTickUnitSupplier();
+        final TickUnitSupplier unitSupplier = new FinancialTickUnitSupplier();
         if (unitSupplier == null) {
             throw new IllegalStateException("class defaults not properly initialised");
         }
@@ -630,8 +632,6 @@ public class DefaultFinancialAxis extends AbstractAxis implements Axis {
             axisLength = getLength();
             localCurrentLowerBound = DefaultFinancialAxis.super.getMin();
             localCurrentUpperBound = DefaultFinancialAxis.super.getMax();
-            //localCurrentLowerBound = ohlcvDataSet.getItem(0).getTimeStamp().getTime()/1000.0;
-            //localCurrentUpperBound = ohlcvDataSet.getLastItem().getTimeStamp().getTime()/1000.0;
             localCurrentLowerIndex = ohlcvDataSet.getXIndex(localCurrentLowerBound);
             localCurrentUpperIndex = ohlcvDataSet.getXIndex(localCurrentUpperBound);
 
@@ -643,6 +643,7 @@ public class DefaultFinancialAxis extends AbstractAxis implements Axis {
 
             localScale = scaleProperty().get();
             //  zero position of dates is the first date in the array.
+            //  scaling and offsets etc needs to be based on indices instead of time.
             final double zero = (0 - localCurrentLowerIndex) * localScale;
             localOffset = zero + localCurrentLowerIndex * localScale;
             localOffset2 = localOffset - cache.localCurrentLowerIndex * cache.localScale;
