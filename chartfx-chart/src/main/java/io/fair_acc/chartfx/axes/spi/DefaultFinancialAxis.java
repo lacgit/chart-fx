@@ -481,35 +481,35 @@ public class DefaultFinancialAxis extends AbstractAxis implements Axis {
         }
 
         final int maxTickCount = getMaxMajorTickLabelCount();
-        final double tickUnit = axisRange.getTickUnit();
         for (double major = firstTick; (major <= axisRange.getUpperBound() && tickValues.size() <= maxTickCount); major += axisRange.getTickUnit()) {
             if (tickValues.size() > getMaxMajorTickLabelCount()) {
                 break;
             }
-            Date tickTimeStamp = new Date((long)(major * 1000));
-            int tickHour = tickTimeStamp.toInstant().atZone(ZoneId.systemDefault()).getHour();
-            int tickMin = tickTimeStamp.toInstant().atZone(ZoneId.systemDefault()).getMinute();
-            int tickHm = tickHour * 100 + tickMin;
-            if (tickHm >=  300 && tickHm <  900)
-                continue;
-            if (tickHm >=  900 && tickHm <  930) {
-                int tickTimeIndex = ohlcvDataSet.getXIndex(major);
-                Date tickIndexTimeStamp = ohlcvDataSet.getItem(tickTimeIndex).getTimeStamp();
-                int firstMin = tickIndexTimeStamp.toInstant().atZone(ZoneId.systemDefault()).getMinute();
-                double newMajor;
-                if (firstMin >= 12 && firstMin <=14) {
-                    newMajor = (tickIndexTimeStamp.getTime() / 1000.0) + (15.0-firstMin)*60;
+            //  if tickUnit is less than daily, then handle trading gaps within a day
+            if  (axisRange.getTickUnit()<86400) {
+                Date tickTimeStamp = new Date((long) (major * 1000));
+                int tickHm = tickTimeStamp.toInstant().atZone(ZoneId.systemDefault()).getHour() * 100 + tickTimeStamp.toInstant().atZone(ZoneId.systemDefault()).getMinute();
+                if (tickHm >= 300 && tickHm < 900)
+                    continue;
+                if (tickHm >= 900 && tickHm < 930) {
+                    //  this handle the AO price, usually 1 or 2 minutes before start of trade at 9.15
+                    //  but if start of trade at 9.30, then no such arrangement
+                    Date tickIndexTimeStamp = ohlcvDataSet.getItem(ohlcvDataSet.getXIndex(major)).getTimeStamp();
+                    int startOfDayMin = tickIndexTimeStamp.toInstant().atZone(ZoneId.systemDefault()).getMinute();
+                    double newMajor;
+                    if (startOfDayMin >= 12 && startOfDayMin <= 14) {
+                        newMajor = (tickIndexTimeStamp.getTime() / 1000.0) + (15.0 - startOfDayMin) * 60;
+                    } else {
+                        newMajor = tickIndexTimeStamp.getTime() / 1000.0;
+                    }
+                    tickValues.add(newMajor);
+                    continue;
                 }
-                else {
-                    newMajor = tickIndexTimeStamp.getTime() / 1000.0;
-                }
-                tickValues.add(newMajor);
-                continue;
+                if (tickHm >= 1200 && tickHm < 1300)
+                    continue;
+                if (tickHm >= 1630 && tickHm < 1715)
+                    continue;
             }
-            if (tickHm >= 1200 && tickHm < 1300)
-                continue;
-            if (tickHm >= 1630 && tickHm < 1715)
-                continue;
             tickValues.add(major);
         }
     }
