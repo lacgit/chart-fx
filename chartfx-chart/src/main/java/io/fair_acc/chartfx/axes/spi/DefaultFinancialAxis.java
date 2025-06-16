@@ -490,7 +490,7 @@ public class DefaultFinancialAxis extends AbstractAxis implements Axis {
             int tickHour = tickTimeStamp.toInstant().atZone(ZoneId.systemDefault()).getHour();
             int tickMin = tickTimeStamp.toInstant().atZone(ZoneId.systemDefault()).getMinute();
             int tickHm = tickHour * 100 + tickMin;
-            if (tickHm >=  300 && tickHm <  830)
+            if (tickHm >=  300 && tickHm <  900)
                 continue;
             if (tickHm >=  900 && tickHm <  930) {
                 int tickTimeIndex = ohlcvDataSet.getXIndex(major);
