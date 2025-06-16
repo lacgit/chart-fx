@@ -30,11 +30,11 @@ public class FinancialTickUnitSupplier implements TickUnitSupplier {
         60.000, // 1 minute
         300.000, // 5 minute
         900.000, // 15 minutes
-        180.000, // 30 minutes
+        1800.000, // 30 minutes
         3600.000, // 1 hour
         5400.000, // 1.5 hours
         7200.000, // 2 hours
-        900.000, // 2.5 hours
+        9000.000, // 2.5 hours
         10800.000, // 3 hours
         12600.000, // 3.5 hours
         14400.000, // 4 hours
@@ -102,9 +102,9 @@ public class FinancialTickUnitSupplier implements TickUnitSupplier {
         "HH:mm", // 2.5 hours
         "HH:mm", // 3 hours
         "HH:mm", // 3.5 hours
-        "HH:mms", // 4 hours
-        "HH:mm:ss", // 4.5 hours
-        "HH:mm:ss", // 5 hours
+        "HH:mm", // 4 hours
+        "HH:mm", // 4.5 hours
+        "HH:mm", // 5 hours
         "dd-MMM HH:mm", // 8 hours
         "dd-MMM HH:mm", // 10 hours
         "dd-MMM HH:mm", // 12 hours
