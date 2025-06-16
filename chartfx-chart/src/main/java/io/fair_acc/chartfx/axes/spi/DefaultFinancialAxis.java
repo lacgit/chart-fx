@@ -20,6 +20,9 @@ import io.fair_acc.chartfx.utils.PropUtil;
 import io.fair_acc.dataset.spi.fastutil.DoubleArrayList;
 
 import java.awt.*;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.Date;
 
 /**
@@ -478,10 +481,35 @@ public class DefaultFinancialAxis extends AbstractAxis implements Axis {
         }
 
         final int maxTickCount = getMaxMajorTickLabelCount();
+        final double tickUnit = axisRange.getTickUnit();
         for (double major = firstTick; (major <= axisRange.getUpperBound() && tickValues.size() <= maxTickCount); major += axisRange.getTickUnit()) {
             if (tickValues.size() > getMaxMajorTickLabelCount()) {
                 break;
             }
+            Date tickTimeStamp = new Date((long)(major * 1000));
+            int tickHour = tickTimeStamp.toInstant().atZone(ZoneId.systemDefault()).getHour();
+            int tickMin = tickTimeStamp.toInstant().atZone(ZoneId.systemDefault()).getMinute();
+            int tickHm = tickHour * 100 + tickMin;
+            if (tickHm >=  300 && tickHm <  830)
+                continue;
+            if (tickHm >=  900 && tickHm <  930) {
+                int tickTimeIndex = ohlcvDataSet.getXIndex(major);
+                Date tickIndexTimeStamp = ohlcvDataSet.getItem(tickTimeIndex).getTimeStamp();
+                int firstMin = tickIndexTimeStamp.toInstant().atZone(ZoneId.systemDefault()).getMinute();
+                double newMajor;
+                if (firstMin >= 12 && firstMin <=14) {
+                    newMajor = (tickIndexTimeStamp.getTime() / 1000.0) + (15.0-firstMin)*60;
+                }
+                else {
+                    newMajor = tickIndexTimeStamp.getTime() / 1000.0;
+                }
+                tickValues.add(newMajor);
+                continue;
+            }
+            if (tickHm >= 1200 && tickHm < 1300)
+                continue;
+            if (tickHm >= 1630 && tickHm < 1715)
+                continue;
             tickValues.add(major);
         }
     }
