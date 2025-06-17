@@ -10,6 +10,7 @@ import java.util.Calendar;
 import java.util.Map;
 
 import io.fair_acc.chartfx.axes.spi.format.FinancialTimeFormatter;
+import io.fair_acc.chartfx.utils.NumberFormatterImpl;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
@@ -259,6 +260,7 @@ public abstract class AbstractBasicFinancialNoGapApplication extends ChartSample
         chart.getGridRenderer().setDrawOnTop(false);
         yAxis1.setAutoRangeRounding(true);
         yAxis1.setSide(Side.RIGHT);
+        yAxis1.setTickLabelFormatter(new NumberFormatterImpl());
 
         // prepare financial renderers
         prepareRenderers(chart, ohlcvDataSet, indiSet);
