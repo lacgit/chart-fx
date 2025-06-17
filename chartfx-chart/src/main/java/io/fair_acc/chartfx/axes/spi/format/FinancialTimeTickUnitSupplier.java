@@ -5,7 +5,7 @@ import io.fair_acc.chartfx.axes.TickUnitSupplier;
 /**
  * @author rstein
  */
-public class FinancialTickUnitSupplier implements TickUnitSupplier {
+public class FinancialTimeTickUnitSupplier implements TickUnitSupplier {
     public static final String HIGHRES_MODE = "HIGHRES";
     public static final int HIGHRES_MODE_INDICES = 3;
     public static final String HIGHRES_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS";
@@ -81,10 +81,10 @@ public class FinancialTickUnitSupplier implements TickUnitSupplier {
         // designating
         // high-resolution
         // timer
-        FinancialTickUnitSupplier.HIGHRES_MODE, // 1 milli-second
-        FinancialTickUnitSupplier.HIGHRES_MODE, // 10 milli-second
-        FinancialTickUnitSupplier.HIGHRES_MODE, // 100 milli-second
-        FinancialTickUnitSupplier.HIGHRES_MODE, // 500 milli-second
+        FinancialTimeTickUnitSupplier.HIGHRES_MODE, // 1 milli-second
+        FinancialTimeTickUnitSupplier.HIGHRES_MODE, // 10 milli-second
+        FinancialTimeTickUnitSupplier.HIGHRES_MODE, // 100 milli-second
+        FinancialTimeTickUnitSupplier.HIGHRES_MODE, // 500 milli-second
         "HH:mm:ss.SSS", // 1 second
         "HH:mm:ss.SSS", // 1.5 seconds
         "HH:mm:ss.SSS", // 2 seconds
@@ -146,7 +146,7 @@ public class FinancialTickUnitSupplier implements TickUnitSupplier {
      */
     @Override
     public double computeTickUnit(final double referenceTickUnit) {
-        return FinancialTickUnitSupplier.TICK_UNIT_DEFAULTS[FinancialTickUnitSupplier
+        return FinancialTimeTickUnitSupplier.TICK_UNIT_DEFAULTS[FinancialTimeTickUnitSupplier
                                                                       .getTickIndex(referenceTickUnit)];
     }
 

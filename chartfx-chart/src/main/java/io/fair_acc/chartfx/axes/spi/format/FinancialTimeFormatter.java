@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
  * @author rstein
  */
 public class FinancialTimeFormatter extends AbstractFormatter {
-    private static final TickUnitSupplier DEFAULT_TICK_UNIT_SUPPLIER = new FinancialTickUnitSupplier();
+    private static final TickUnitSupplier DEFAULT_TICK_UNIT_SUPPLIER = new FinancialTimeTickUnitSupplier();
     private static final DateTimeFormatter HIGHRES_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss +SSS",
             Locale.ENGLISH);
     protected final DateTimeFormatter[] dateFormat;
@@ -40,10 +40,10 @@ public class FinancialTimeFormatter extends AbstractFormatter {
         super(axis);
         setTickUnitSupplier(FinancialTimeFormatter.DEFAULT_TICK_UNIT_SUPPLIER);
 
-        dateFormat = new DateTimeFormatter[FinancialTickUnitSupplier.TICK_UNIT_FORMATTER_DEFAULTS.length];
+        dateFormat = new DateTimeFormatter[FinancialTimeTickUnitSupplier.TICK_UNIT_FORMATTER_DEFAULTS.length];
         for (int i = 0; i < dateFormat.length; i++) {
-            final String format = FinancialTickUnitSupplier.TICK_UNIT_FORMATTER_DEFAULTS[i];
-            if (format.contains(FinancialTickUnitSupplier.HIGHRES_MODE)) {
+            final String format = FinancialTimeTickUnitSupplier.TICK_UNIT_FORMATTER_DEFAULTS[i];
+            if (format.contains(FinancialTimeTickUnitSupplier.HIGHRES_MODE)) {
                 dateFormat[i] = FinancialTimeFormatter.HIGHRES_FORMATTER;
             } else {
                 dateFormat[i] = DateTimeFormatter.ofPattern(format, Locale.ENGLISH);
@@ -71,7 +71,7 @@ public class FinancialTimeFormatter extends AbstractFormatter {
     }
 
     private String getTimeString(final Number utcValueSeconds) {
-        if (formatterIndex <= FinancialTickUnitSupplier.HIGHRES_MODE_INDICES) {
+        if (formatterIndex <= FinancialTimeTickUnitSupplier.HIGHRES_MODE_INDICES) {
             return formatHighResString(utcValueSeconds);
         }
 
@@ -97,7 +97,7 @@ public class FinancialTimeFormatter extends AbstractFormatter {
     @Override
     protected void rangeUpdated() {
         // set formatter based on range if necessary
-        formatterIndex = FinancialTickUnitSupplier.getTickIndex(getRange());
+        formatterIndex = FinancialTimeTickUnitSupplier.getTickIndex(getRange());
         if (oldIndex != formatterIndex) {
             labelCache.clear();
             oldIndex = formatterIndex;

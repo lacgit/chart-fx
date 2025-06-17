@@ -1,7 +1,6 @@
 package io.fair_acc.chartfx.axes.spi;
 
 import io.fair_acc.chartfx.axes.*;
-import io.fair_acc.chartfx.axes.spi.format.FinancialTickUnitSupplier;
 import io.fair_acc.dataset.spi.financial.OhlcvDataSet;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
@@ -17,9 +16,7 @@ import io.fair_acc.chartfx.utils.PropUtil;
 import io.fair_acc.dataset.spi.fastutil.DoubleArrayList;
 
 import java.awt.*;
-import java.time.Instant;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.util.Date;
 
 /**
