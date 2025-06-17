@@ -1,5 +1,6 @@
 package io.fair_acc.chartfx.axes.spi;
 
+import io.fair_acc.chartfx.axes.*;
 import io.fair_acc.chartfx.axes.spi.format.FinancialTickUnitSupplier;
 import io.fair_acc.dataset.spi.financial.OhlcvDataSet;
 import javafx.beans.property.BooleanProperty;
@@ -9,10 +10,6 @@ import javafx.beans.property.SimpleBooleanProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.fair_acc.chartfx.axes.Axis;
-import io.fair_acc.chartfx.axes.AxisTransform;
-import io.fair_acc.chartfx.axes.LogAxisType;
-import io.fair_acc.chartfx.axes.TickUnitSupplier;
 import io.fair_acc.chartfx.axes.spi.transforms.DefaultAxisTransform;
 import io.fair_acc.chartfx.axes.spi.transforms.LogarithmicAxisTransform;
 import io.fair_acc.chartfx.axes.spi.transforms.LogarithmicTimeAxisTransform;
@@ -148,6 +145,7 @@ public class DefaultFinancialAxis extends AbstractAxis implements Axis {
         }
         setTickUnit(tickUnit);
         setMinorTickCount(AbstractAxisParameter.DEFAULT_MINOR_TICK_COUNT);
+        setOverlapPolicy(AxisLabelOverlapPolicy.DO_NOTHING);
 
         isUpdating = false;
     }
@@ -481,12 +479,13 @@ public class DefaultFinancialAxis extends AbstractAxis implements Axis {
         }
 
         final int maxTickCount = getMaxMajorTickLabelCount();
-        for (double major = firstTick; (major <= axisRange.getUpperBound() && tickValues.size() <= maxTickCount); major += axisRange.getTickUnit()) {
-            if (tickValues.size() > getMaxMajorTickLabelCount()) {
-                break;
-            }
+        if  (axisRange.getTickUnit()<86400) {
             //  if tickUnit is less than daily, then handle trading gaps within a day
-            if  (axisRange.getTickUnit()<86400) {
+            //  special behavior: together with AxisOverlapPolicy.SKIP_ALT, sometime there will be 9.15, 9.25, 9.35 ...
+            for (double major = firstTick; (major <= axisRange.getUpperBound() && tickValues.size() <= maxTickCount); major += axisRange.getTickUnit()) {
+                if (tickValues.size() > getMaxMajorTickLabelCount()) {
+                    break;
+                }
                 Date tickTimeStamp = new Date((long) (major * 1000));
                 int tickHm = tickTimeStamp.toInstant().atZone(ZoneId.systemDefault()).getHour() * 100 + tickTimeStamp.toInstant().atZone(ZoneId.systemDefault()).getMinute();
                 if (tickHm >= 300 && tickHm < 900)
@@ -494,6 +493,7 @@ public class DefaultFinancialAxis extends AbstractAxis implements Axis {
                 if (tickHm >= 900 && tickHm < 930) {
                     //  this handle the AO price, usually 1 or 2 minutes before start of trade at 9.15
                     //  but if start of trade at 9.30, then no such arrangement
+                    int tickIndex = ohlcvDataSet.getXIndex(major);
                     Date tickIndexTimeStamp = ohlcvDataSet.getItem(ohlcvDataSet.getXIndex(major)).getTimeStamp();
                     int startOfDayMin = tickIndexTimeStamp.toInstant().atZone(ZoneId.systemDefault()).getMinute();
                     double newMajor;
@@ -509,8 +509,15 @@ public class DefaultFinancialAxis extends AbstractAxis implements Axis {
                     continue;
                 if (tickHm >= 1630 && tickHm < 1715)
                     continue;
+                tickValues.add(major);
             }
-            tickValues.add(major);
+        } else {
+            for (double major = firstTick; (major <= axisRange.getUpperBound() && tickValues.size() <= maxTickCount); major += axisRange.getTickUnit()) {
+                if (tickValues.size() > getMaxMajorTickLabelCount()) {
+                    break;
+                }
+                tickValues.add(major);
+            }
         }
     }
 
