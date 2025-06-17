@@ -600,8 +600,7 @@ public class DefaultFinancialAxis extends AbstractAxis implements Axis {
     }
 
     protected double computeTickUnit(final double rawTickUnit) {
-        //final TickUnitSupplier unitSupplier = getAxisLabelFormatter().getTickUnitSupplier();
-        final TickUnitSupplier unitSupplier = new FinancialTickUnitSupplier();
+        final TickUnitSupplier unitSupplier = getAxisLabelFormatter().getTickUnitSupplier();
         if (unitSupplier == null) {
             throw new IllegalStateException("class defaults not properly initialised");
         }

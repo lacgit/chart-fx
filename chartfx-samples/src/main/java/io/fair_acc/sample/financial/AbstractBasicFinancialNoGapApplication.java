@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Map;
 
+import io.fair_acc.chartfx.axes.spi.format.FinancialTimeFormatter;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
@@ -28,7 +29,6 @@ import io.fair_acc.chartfx.XYChart;
 import io.fair_acc.chartfx.axes.AxisLabelOverlapPolicy;
 import io.fair_acc.chartfx.axes.AxisMode;
 import io.fair_acc.chartfx.axes.spi.DefaultNumericAxis;
-import io.fair_acc.chartfx.axes.spi.format.DefaultTimeFormatter;
 import io.fair_acc.chartfx.plugins.ChartPlugin;
 import io.fair_acc.chartfx.plugins.DataPointTooltip;
 import io.fair_acc.chartfx.plugins.EditAxis;
@@ -227,10 +227,11 @@ public abstract class AbstractBasicFinancialNoGapApplication extends ChartSample
         xAxis1.setOverlapPolicy(AxisLabelOverlapPolicy.SKIP_ALT);
         xAxis1.setAutoRangeRounding(false);
         xAxis1.setTimeAxis(true);
+        xAxis1.setAxisLabelFormatter(new FinancialTimeFormatter());
 
         // set localised time offset
-        if (xAxis1.isTimeAxis() && xAxis1.getAxisLabelFormatter() instanceof DefaultTimeFormatter) {
-            final DefaultTimeFormatter axisFormatter = (DefaultTimeFormatter) xAxis1.getAxisLabelFormatter();
+        if (xAxis1.isTimeAxis() && xAxis1.getAxisLabelFormatter() instanceof FinancialTimeFormatter) {
+            final FinancialTimeFormatter axisFormatter = (FinancialTimeFormatter) xAxis1.getAxisLabelFormatter();
             axisFormatter.setTimeZoneOffset(ZoneOffset.ofHoursMinutes(zoneOffsetHr, 0));
         }
 
