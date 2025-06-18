@@ -12,7 +12,9 @@ import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @author rstein
+ * Direct adopt and modified from {@link DefaultTimeFormatter}
+ *
+ * @author lacgit
  */
 public class FinancialTimeFormatter extends AbstractFormatter {
     private static final TickUnitSupplier DEFAULT_TICK_UNIT_SUPPLIER = new FinancialTimeTickUnitSupplier();

@@ -12,14 +12,11 @@ import java.util.Map;
 import io.fair_acc.chartfx.axes.spi.format.FinancialTimeFormatter;
 import io.fair_acc.chartfx.utils.NumberFormatterImpl;
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.slf4j.Logger;
@@ -53,10 +50,8 @@ import io.fair_acc.sample.financial.service.SimpleOhlcvReplayDataSet.DataInput;
 import io.fair_acc.sample.financial.service.consolidate.OhlcvConsolidationAddon;
 import io.fair_acc.sample.financial.service.period.IntradayPeriod;
 
-import fxsampler.SampleBase;
-
 /**
- * A replicate of {@link AbstractBasicFinancialApplication}.
+ * Direct adopt and modified from {@link AbstractBasicFinancialApplication}.
  * It uses {@link DefaultFinancialAxis} instead of {@link DefaultNumericAxis}.
  *
  * @author lacgit

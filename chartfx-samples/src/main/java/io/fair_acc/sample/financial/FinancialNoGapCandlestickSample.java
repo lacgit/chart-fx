@@ -21,9 +21,9 @@ import io.fair_acc.dataset.spi.financial.api.attrs.AttributeKey;
 import io.fair_acc.dataset.spi.financial.api.ohlcv.IOhlcvItem;
 
 /**
- * Advanced configuration of Candlestick renderer. Support for PaintBars and extension points.
+ * Direct adopt and modified from {@link FinancialAdvancedCandlestickSample}
  *
- * @author afischer
+ * @author lacgit
  */
 public class FinancialNoGapCandlestickSample extends AbstractBasicFinancialNoGapApplication {
     public static final AttributeKey<Boolean> MARK_BAR = AttributeKey.create(Boolean.class, "MARK_BAR");

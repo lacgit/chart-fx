@@ -3,7 +3,9 @@ package io.fair_acc.chartfx.axes.spi.format;
 import io.fair_acc.chartfx.axes.TickUnitSupplier;
 
 /**
- * @author rstein
+ * Direct adopt and modified from {@link DefaultTimeTickUnitSupplier}
+ *
+ * @author lacgit
  */
 public class FinancialTimeTickUnitSupplier implements TickUnitSupplier {
     public static final String HIGHRES_MODE = "HIGHRES";
@@ -69,6 +71,7 @@ public class FinancialTimeTickUnitSupplier implements TickUnitSupplier {
         96854400.000, // 170 days
         112924800.000, // 186 days ~ 6 months
         144547200.000, // 366 days ~ 1 year
+        144547200.000 * 3, // 366 days ~ 5 years
         144547200.000 * 5, // 366 days ~ 5 years
         144547200.000 * 10, // 366 days ~ 10 years
     };
@@ -134,6 +137,7 @@ public class FinancialTimeTickUnitSupplier implements TickUnitSupplier {
         "yyyy-MMM-dd", // 170 days
         "yyyy-MMM-dd", // 186 days ~ 6 months
         "yyyy-MMM-dd", // 366 days ~ 1 year
+        "yyyy-MMM", // 366 days ~ 3 years
         "yyyy-MMM", // 366 days ~ 5 years
         "yyyy" // 366 days ~ 10 years
     };
