@@ -1,5 +1,6 @@
 package io.fair_acc.chartfx.plugins;
 
+import io.fair_acc.chartfx.axes.spi.DefaultFinancialAxis;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Orientation;
@@ -108,6 +109,9 @@ public abstract class AbstractDataFormattingPlugin extends ChartPlugin {
     }
 
     private StringConverter<Number> getXValueFormatter(final Axis xAxis) {
+        if  (xAxis instanceof DefaultFinancialAxis) {
+            return getValueFormatter(xAxis, getXValueFormatter(), defaultXValueFormatter);
+        }
         return getValueFormatter(xAxis, getXValueFormatter(), defaultXValueFormatter);
     }
 

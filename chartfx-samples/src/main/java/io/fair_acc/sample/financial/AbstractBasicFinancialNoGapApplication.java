@@ -10,6 +10,7 @@ import java.util.Calendar;
 import java.util.Map;
 
 import io.fair_acc.chartfx.axes.spi.format.FinancialTimeFormatter;
+import io.fair_acc.chartfx.plugins.*;
 import io.fair_acc.chartfx.utils.NumberFormatterImpl;
 import javafx.application.Application;
 import javafx.geometry.Pos;
@@ -27,10 +28,6 @@ import io.fair_acc.chartfx.XYChart;
 import io.fair_acc.chartfx.axes.AxisLabelOverlapPolicy;
 import io.fair_acc.chartfx.axes.AxisMode;
 import io.fair_acc.chartfx.axes.spi.DefaultNumericAxis;
-import io.fair_acc.chartfx.plugins.ChartPlugin;
-import io.fair_acc.chartfx.plugins.DataPointTooltip;
-import io.fair_acc.chartfx.plugins.EditAxis;
-import io.fair_acc.chartfx.plugins.Zoomer;
 import io.fair_acc.chartfx.renderer.spi.financial.AbstractFinancialRenderer;
 import io.fair_acc.chartfx.renderer.spi.financial.FinancialTheme;
 import io.fair_acc.chartfx.ui.ProfilerInfoBox;
@@ -76,7 +73,7 @@ public abstract class AbstractBasicFinancialNoGapApplication extends ChartSample
     protected int zoneOffsetHr = 2;
      */
 
-    protected String resource = "@HS-[TF1]";
+    protected String resource = "@HS-[TF15]";
     protected String datePattern = "yyyy-MM-dd";
     protected String timeRange = "2025/05/13 09:00-2025/05/13 16:30";
     protected int zoneOffsetHr = 8;
@@ -249,7 +246,7 @@ public abstract class AbstractBasicFinancialNoGapApplication extends ChartSample
         // prepare plugins
         chart.getPlugins().add(new Zoomer(AxisMode.X));
         chart.getPlugins().add(new EditAxis());
-        chart.getPlugins().add(new DataPointTooltip());
+        chart.getPlugins().add(new OhlcvTooltip());
 
         // basic chart financial structure style
         chart.getGridRenderer().setDrawOnTop(false);
