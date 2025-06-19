@@ -19,7 +19,10 @@ import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
+import javafx.util.StringConverter;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -76,6 +79,19 @@ public class OhlcvTooltip extends AbstractDataFormattingPlugin {
         label.setWrapText(true);
         label.setMinWidth(0);
         label.setManaged(false);
+        setXValueFormatter(new StringConverter<Number>() {
+            private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MMM-dd HH:mm:ss");
+            @Override
+            public String toString(Number number) {
+                if (number == null) return "";
+                return dateFormat.format(new Date(number.longValue()*1000));
+            }
+
+            @Override
+            public Number fromString(String s) {
+                return null;
+            }
+        });
         registerInputEventHandler(MouseEvent.MOUSE_MOVED, mouseMoveHandler);
     }
 
