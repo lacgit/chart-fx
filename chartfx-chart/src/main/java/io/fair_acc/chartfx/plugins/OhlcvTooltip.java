@@ -6,6 +6,7 @@ package io.fair_acc.chartfx.plugins;
 import io.fair_acc.chartfx.Chart;
 import io.fair_acc.chartfx.XYChart;
 import io.fair_acc.chartfx.axes.Axis;
+import io.fair_acc.chartfx.axes.spi.format.DefaultTimeFormatter;
 import io.fair_acc.chartfx.renderer.Renderer;
 import io.fair_acc.chartfx.renderer.spi.ErrorDataSetRenderer;
 import io.fair_acc.dataset.DataSet;
@@ -30,17 +31,9 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 /**
- * A tool tip label appearing next to the mouse cursor when placed over a data point's symbol. If symbols are not
- * created/shown for given plot, the tool tip is shown for the closest data point that is within the
- * {@link #pickingDistanceProperty()} from the mouse cursor.
- * <p>
- * CSS style class name: {@value #STYLE_CLASS_LABEL}
- * <p>
- * TODO: extend so that label = new Label(); is a generic object and can also be overwritten with
- * another implementation (&lt;-&gt; advanced interactor) additional add/remove listener are needed to
- * edit/update the custom object based on DataPoint (for the time being private class)
+ * Direct adopt and modified from {@link DataPointTooltip}
  *
- * @author Grzegorz Kruk
+ * @author lacgit
  */
 public class OhlcvTooltip extends AbstractDataFormattingPlugin {
     /**
@@ -85,6 +78,17 @@ public class OhlcvTooltip extends AbstractDataFormattingPlugin {
             public String toString(Number number) {
                 if (number == null) return "";
                 return dateFormat.format(new Date(number.longValue()*1000));
+            }
+
+            @Override
+            public Number fromString(String s) {
+                return null;
+            }
+        });
+        setYValueFormatter(new StringConverter<Number>() {
+            @Override
+            public String toString(Number number) {
+                return String.format("%,d%n", number.intValue());
             }
 
             @Override
