@@ -1,26 +1,23 @@
 package io.fair_acc.chartfx.axes.spi;
 
 import io.fair_acc.chartfx.axes.*;
-import io.fair_acc.dataset.spi.financial.OhlcvDataSet;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import io.fair_acc.chartfx.axes.spi.transforms.DefaultAxisTransform;
 import io.fair_acc.chartfx.axes.spi.transforms.LogarithmicAxisTransform;
 import io.fair_acc.chartfx.axes.spi.transforms.LogarithmicTimeAxisTransform;
 import io.fair_acc.chartfx.utils.PropUtil;
 import io.fair_acc.dataset.spi.fastutil.DoubleArrayList;
+import io.fair_acc.dataset.spi.financial.OhlcvDataSet;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.awt.*;
 import java.time.ZoneId;
 import java.util.Date;
 
-/**
- * A axis class that plots a range of dates with major tick marks every TODO:"tickUnit".
+/*
+ * A axis class that plots a range of dates with major tick marks every "tickUnit".
  * To be consistent with the library, it was decided to use Date instead of the more modern LocalDateTime.
  * <p>
  * Compared to the {@link DefaultNumericAxis} this one changes
@@ -40,9 +37,7 @@ import java.util.Date;
  * For situations when an {@link OhlcvDataSet} might have missing datetime item will be handle
  * separately.
  *
- * TODO: 1. Handle overlapping tick marks at the end-beginning of time gaps,
- *       2. Scrolling start working, still sometime seems "non-linear", may be wrong scaling
- *       3. Handle log time scale?  Not sure has any practical value or not. Gaps may not
+ * TODO: 1. Handle log time scale?  Not sure has any practical value or not. Gaps may not
  *          be relevant if really needed.
  * </ul>
  *
@@ -147,7 +142,7 @@ public class DefaultFinancialAxis extends AbstractAxis implements Axis {
         isUpdating = false;
     }
 
-    /**
+    /*
      * Creates an {@link #autoRangingProperty() auto-ranging} Axis.
      *
      * @param axisLabel the axis {@link #nameProperty() label}
@@ -376,10 +371,13 @@ public class DefaultFinancialAxis extends AbstractAxis implements Axis {
 
         double rawTickUnit = (max - min) / numOfTickMarks;
         if (rawTickUnit == 0 || Double.isNaN(rawTickUnit)) {
-            rawTickUnit = 1e-3; // TODO: remove hack
+            //  practically for financial time, use msec as the minimal tick unit
+            rawTickUnit = 1e-3;
         }
 
-        // double tickUnitRounded = Double.MIN_VALUE; // TODO check if not '-Double.MAX_VALUE'
+        // practically not relevant to financial time
+        // check if not '-Double.MAX_VALUE'
+        // double tickUnitRounded = Double.MIN_VALUE;
         final double tickUnitRounded = computeTickUnit(rawTickUnit);
         final boolean round = (isAutoRanging() || isAutoGrowRanging()) && isAutoRangeRounding();
         final double minRounded = round ? axisTransform.getRoundedMinimumRange(min) : min;

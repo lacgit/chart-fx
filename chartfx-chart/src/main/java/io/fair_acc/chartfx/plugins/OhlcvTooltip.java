@@ -142,8 +142,9 @@ public class OhlcvTooltip extends AbstractDataFormattingPlugin {
             return Stream.empty(); // ignore this renderer because there are no valid axes available
         }
 
+        //  practically not relevant for ohlcvDataSet
         if (dataset instanceof GridDataSet) {
-            return Stream.empty(); // TODO: correct impl for grid data sets
+            return Stream.empty(); // correct impl for grid data sets
         }
 
         return dataset.lock().readLockGuard(() -> {
