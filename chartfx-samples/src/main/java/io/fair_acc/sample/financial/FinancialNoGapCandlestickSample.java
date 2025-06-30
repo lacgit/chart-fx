@@ -47,7 +47,7 @@ public class FinancialNoGapCandlestickSample extends AbstractBasicFinancialNoGap
         return root;
     }
 
-    protected void prepareRenderers(XYChart chart, OhlcvDataSet ohlcvDataSet, DefaultDataSet indiSet) {
+    protected void prepareRenderers(XYChart chart, OhlcvDataSet ohlcvDataSet, DefaultDataSet indiSet, ErrorDataSetRenderer errorDataSetRenderer2, DefaultDataSet dataSet2) {
         // create and apply renderers
         var candleStickRenderer = new CandleStickRenderer(true);
         candleStickRenderer.getDatasets().addAll(ohlcvDataSet);
@@ -60,6 +60,7 @@ public class FinancialNoGapCandlestickSample extends AbstractBasicFinancialNoGap
         chart.getRenderers().clear();
         chart.getRenderers().add(candleStickRenderer);
         chart.getRenderers().add(avgRenderer);
+        chart.getRenderers().add(errorDataSetRenderer2);
 
         //------------------------------------------
         // Example of extension possibilities

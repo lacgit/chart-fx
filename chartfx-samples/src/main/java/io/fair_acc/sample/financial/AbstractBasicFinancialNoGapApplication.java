@@ -11,6 +11,7 @@ import java.util.Map;
 
 import io.fair_acc.chartfx.axes.spi.format.FinancialTimeFormatter;
 import io.fair_acc.chartfx.plugins.*;
+import io.fair_acc.chartfx.renderer.spi.ErrorDataSetRenderer;
 import io.fair_acc.chartfx.utils.NumberFormatterImpl;
 import javafx.application.Application;
 import javafx.geometry.Pos;
@@ -73,9 +74,10 @@ public abstract class AbstractBasicFinancialNoGapApplication extends ChartSample
     protected int zoneOffsetHr = 2;
      */
 
-    protected String resource = "@HS-[TF15]";
-    protected String datePattern = "yyyy-MM-dd";
-    protected String timeRange = "2025/05/13 09:00-2025/05/13 16:30";
+    protected String resource = "@ES-[TF1D]";
+    protected String resource2 = "@HS-[TF1D]";
+    protected String datePattern = "MM/dd/yyyy";
+    protected String timeRange = "2013/02/25 09:00-2020/05/13 16:30";
     protected int zoneOffsetHr = 8;
     protected String replayFrom;
     protected IntradayPeriod period;
@@ -190,6 +192,7 @@ public abstract class AbstractBasicFinancialNoGapApplication extends ChartSample
     protected Chart getDefaultFinancialTestChart(final FinancialTheme theme) {
         // load datasets
         DefaultDataSet indiSet = null;
+        DefaultDataSet dataSet2 = null;
         if (resource.startsWith("REALTIME")) {
             try {
                 Interval<Calendar> timeRangeInt = CalendarUtils.createByDateTimeInterval(timeRange);
@@ -206,10 +209,11 @@ public abstract class AbstractBasicFinancialNoGapApplication extends ChartSample
                 throw new IllegalArgumentException(e.getMessage(), e);
             }
         } else {
-            ohlcvDataSet = new OhlcvDataSet(resource);
+            ohlcvDataSet    = new OhlcvDataSet(resource);
             indiSet = new DefaultDataSet("MA(24)");
+            dataSet2 = new DefaultDataSet(resource2);
             try {
-                loadTestData(resource, ohlcvDataSet, indiSet);
+                loadTestData(resource, ohlcvDataSet, indiSet, resource2, dataSet2);
             } catch (IOException e) {
                 throw new IllegalArgumentException(e.getMessage(), e);
             }
@@ -233,7 +237,7 @@ public abstract class AbstractBasicFinancialNoGapApplication extends ChartSample
         // xAxis.setTickLabelRotation(90);
         // xAxis.setOverlapPolicy(AxisLabelOverlapPolicy.SKIP_ALT);
 
-        final DefaultNumericAxis yAxis1 = new DefaultNumericAxis("price", "points");
+        final DefaultNumericAxis yAxis1 = new DefaultNumericAxis("ES", "points");
 
         // prepare chart structure
         final XYChart chart = new XYChart(xAxis1, yAxis1);
@@ -242,6 +246,7 @@ public abstract class AbstractBasicFinancialNoGapApplication extends ChartSample
         chart.setPrefSize(prefChartWidth, prefChartHeight);
         // set them false to make the plot faster
         chart.setAnimated(false);
+
 
         // prepare plugins
         chart.getPlugins().add(new Zoomer(AxisMode.X));
@@ -254,8 +259,15 @@ public abstract class AbstractBasicFinancialNoGapApplication extends ChartSample
         yAxis1.setSide(Side.RIGHT);
         yAxis1.setTickLabelFormatter(new NumberFormatterImpl());
 
+        final DefaultNumericAxis yAxis2 = new DefaultNumericAxis("HS", "points");
+        yAxis2.setSide(Side.RIGHT);
+        yAxis2.setTickLabelFormatter(new NumberFormatterImpl());
+        final ErrorDataSetRenderer errorRenderer2 = new ErrorDataSetRenderer();
+        errorRenderer2.getAxes().add(yAxis2);
+        errorRenderer2.getDatasets().setAll(dataSet2);
+
         // prepare financial renderers
-        prepareRenderers(chart, ohlcvDataSet, indiSet);
+        prepareRenderers(chart, ohlcvDataSet, indiSet, errorRenderer2, dataSet2);
 
         // apply color scheme
         theme.applyPseudoClasses(chart);
@@ -315,7 +327,7 @@ public abstract class AbstractBasicFinancialNoGapApplication extends ChartSample
      * @param indiSet example of indicator calculation
      * @throws IOException if loading fails
      */
-    protected void loadTestData(String data, final OhlcvDataSet dataSet, DefaultDataSet indiSet) throws IOException {
+    protected void loadTestData(String data, final OhlcvDataSet dataSet, DefaultDataSet indiSet, String data2, DefaultDataSet dataSet2) throws IOException {
         final long startTime = ProcessingProfiler.getTimeStamp();
 
         IOhlcv ohlcv = new SimpleOhlcvMinuteParser(datePattern).getContinuousOHLCV(data);
@@ -327,6 +339,12 @@ public abstract class AbstractBasicFinancialNoGapApplication extends ChartSample
             stats.addValue(ohlcvItem.getClose());
             indiSet.add(timestamp, stats.getMean());
         }
+
+        IOhlcv ohlcv2 = new SimpleOhlcvMinuteParser(datePattern).getContinuousOHLCV(data2);
+        for (IOhlcvItem ohlcvItem : ohlcv2) {
+            double timestamp = ohlcvItem.getTimeStamp().getTime() / 1000.0;
+            dataSet2.add(timestamp, ohlcvItem.getClose());
+        }
         ProcessingProfiler.getTimeDiff(startTime, "adding data into DataSet");
     }
 
@@ -335,7 +353,7 @@ public abstract class AbstractBasicFinancialNoGapApplication extends ChartSample
      *
      * @param chart for applying renderers
      */
-    protected abstract void prepareRenderers(XYChart chart, OhlcvDataSet ohlcvDataSet, DefaultDataSet indiSet);
+    protected abstract void prepareRenderers(XYChart chart, OhlcvDataSet ohlcvDataSet, DefaultDataSet indiSet, ErrorDataSetRenderer errorDataSetRenderer2, DefaultDataSet dataSet2);
 
     //--------- replay support ---------
 
