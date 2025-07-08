@@ -1,11 +1,5 @@
 package io.fair_acc.chartfx.plugins;
 
-import io.fair_acc.chartfx.axes.spi.DefaultFinancialAxis;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.geometry.Orientation;
-import javafx.util.StringConverter;
-
 import io.fair_acc.chartfx.Chart;
 import io.fair_acc.chartfx.XYChart;
 import io.fair_acc.chartfx.axes.Axis;
@@ -13,6 +7,10 @@ import io.fair_acc.chartfx.axes.spi.MetricPrefix;
 import io.fair_acc.chartfx.renderer.Renderer;
 import io.fair_acc.chartfx.ui.geometry.Side;
 import io.fair_acc.dataset.spi.utils.Tuple;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.geometry.Orientation;
+import javafx.util.StringConverter;
 
 /**
  * An abstract plugin with associated formatters for X and Y value of the data. For details see {@link #formatData}.
