@@ -109,9 +109,6 @@ public abstract class AbstractDataFormattingPlugin extends ChartPlugin {
     }
 
     private StringConverter<Number> getXValueFormatter(final Axis xAxis) {
-        if  (xAxis instanceof DefaultFinancialAxis) {
-            return getValueFormatter(xAxis, getXValueFormatter(), defaultXValueFormatter);
-        }
         return getValueFormatter(xAxis, getXValueFormatter(), defaultXValueFormatter);
     }
 
