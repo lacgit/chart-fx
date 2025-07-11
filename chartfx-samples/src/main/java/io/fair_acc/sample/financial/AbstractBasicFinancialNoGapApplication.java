@@ -11,9 +11,12 @@ import java.util.Map;
 
 import io.fair_acc.chartfx.axes.spi.format.FinancialTimeFormatter;
 import io.fair_acc.chartfx.plugins.*;
+import io.fair_acc.chartfx.renderer.spi.ContourDataSetRenderer;
 import io.fair_acc.chartfx.renderer.spi.ErrorDataSetRenderer;
+import io.fair_acc.chartfx.utils.AxisSynchronizer;
 import io.fair_acc.chartfx.utils.NumberFormatterImpl;
 import javafx.application.Application;
+import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
@@ -82,6 +85,7 @@ public abstract class AbstractBasicFinancialNoGapApplication extends ChartSample
     protected String replayFrom;
     protected IntradayPeriod period;
     protected OhlcvDataSet ohlcvDataSet;
+    protected AxisSynchronizer  financialAxisSynchronizer = new AxisSynchronizer();
     protected Map<String, OhlcvConsolidationAddon[]> consolidationAddons;
 
     private final Spinner<Double> updatePeriod = new Spinner<>(1.0, 500.0, UPDATE_PERIOD, 1.0);
@@ -189,7 +193,7 @@ public abstract class AbstractBasicFinancialNoGapApplication extends ChartSample
      *
      * @param theme defines theme which has to be used for sample app
      */
-    protected Chart getDefaultFinancialTestChart(final FinancialTheme theme) {
+    protected SplitPane getDefaultFinancialTestChart(final FinancialTheme theme) {
         // load datasets
         DefaultDataSet indiSet = null;
         DefaultDataSet dataSet2 = null;
@@ -272,12 +276,20 @@ public abstract class AbstractBasicFinancialNoGapApplication extends ChartSample
         // apply color scheme
         theme.applyPseudoClasses(chart);
 
+        XYChart rsi = getIndicatorChart("RSI", ohlcvDataSet);
+        financialAxisSynchronizer.add(chart.getXAxis());
+        financialAxisSynchronizer.add(rsi.getXAxis());
+
         // zoom to specific time range
         if (timeRange != null) {
             showPredefinedTimeRange(timeRange, ohlcvDataSet, xAxis1, yAxis1);
         }
 
-        return chart;
+        SplitPane    techChart = new SplitPane();
+        techChart.setOrientation(Orientation.VERTICAL);
+        techChart.getItems().addAll(chart, rsi);
+        techChart.setDividerPosition(0, 0.75);
+        return techChart;
     }
 
     /**
@@ -385,6 +397,25 @@ public abstract class AbstractBasicFinancialNoGapApplication extends ChartSample
             SimpleOhlcvReplayDataSet realtimeDataSet = (SimpleOhlcvReplayDataSet) ohlcvDataSet;
             realtimeDataSet.stop();
         }
+    }
+
+    private static XYChart getIndicatorChart(String title, OhlcvDataSet ohlcvDataSet) {
+        DefaultFinancialAxis xAxis = new DefaultFinancialAxis("time", "iso", ohlcvDataSet);
+        DefaultNumericAxis yAxis = new DefaultNumericAxis(title, "ind");
+        final XYChart chart = new XYChart(xAxis, yAxis);
+        xAxis.setOverlapPolicy(AxisLabelOverlapPolicy.SKIP_ALT);
+        xAxis.setAutoRangeRounding(false);
+        xAxis.setTimeAxis(true);
+        xAxis.setAxisLabelFormatter(new FinancialTimeFormatter());
+        yAxis.setSide(Side.RIGHT);
+        chart.getPlugins().add(new Zoomer());
+        chart.getPlugins().add(new EditAxis());
+        chart.getPlugins().add(new DataPointTooltip());
+
+        GridPane.setHgrow(chart, Priority.ALWAYS);
+        GridPane.setVgrow(chart, Priority.ALWAYS);
+
+        return chart;
     }
 
     /**

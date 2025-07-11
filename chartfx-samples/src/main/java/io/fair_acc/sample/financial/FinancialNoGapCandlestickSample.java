@@ -2,6 +2,7 @@ package io.fair_acc.sample.financial;
 
 import java.util.Calendar;
 
+import io.fair_acc.chartfx.Chart;
 import javafx.application.Application;
 import javafx.scene.Node;
 import javafx.scene.layout.Priority;
@@ -34,7 +35,8 @@ public class FinancialNoGapCandlestickSample extends AbstractBasicFinancialNoGap
     @Override
     public Node getChartPanel(Stage stage) {
 
-        final var chart = getDefaultFinancialTestChart(FinancialTheme.Clearlook);
+        final var splitp = getDefaultFinancialTestChart(FinancialTheme.Clearlook);
+        Chart chart = (Chart)splitp.getItems().get(0);
         final AbstractFinancialRenderer<?> renderer = (AbstractFinancialRenderer<?>) chart.getRenderers().get(0);
 
         // prepare top financial toolbar
@@ -42,7 +44,7 @@ public class FinancialNoGapCandlestickSample extends AbstractBasicFinancialNoGap
 
         var root = new VBox();
         VBox.setVgrow(chart, Priority.SOMETIMES);
-        root.getChildren().addAll(testVariableToolBar, chart);
+        root.getChildren().addAll(testVariableToolBar, splitp);
 
         return root;
     }
