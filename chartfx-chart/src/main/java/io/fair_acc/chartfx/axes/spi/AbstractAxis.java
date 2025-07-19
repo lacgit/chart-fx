@@ -843,9 +843,10 @@ public abstract class AbstractAxis extends AbstractAxisParameter implements Axis
                 continue;
             }
 
-            double position = tickMark.getPosition();
-            double coord = isEven ? evenCoord : oddCoord;
-            if (getDrawTickMarkLabel()) {
+            //  intended to draw the tick mark only but not the label if flag is turned off
+            if (drawTickMarkLabel) {
+                double position = tickMark.getPosition();
+                double coord = isEven ? evenCoord : oddCoord;
                 if (isHorizontal) {
                     drawTickMarkLabel(gc, position, coord, scaleFont, tickMark);
                 } else {
@@ -1225,10 +1226,6 @@ public abstract class AbstractAxis extends AbstractAxisParameter implements Axis
     private DurationMeasure benchComputePrefSize = DurationMeasure.DISABLED;
     private DurationMeasure benchUpdateDirtyContent = DurationMeasure.DISABLED;
     private DurationMeasure benchDrawAxis = DurationMeasure.DISABLED;
-
-    public boolean getDrawTickMarkLabel() {
-        return  drawTickMarkLabel;
-    }
 
     public void setDrawTickMarkLabel(boolean value) {
         drawTickMarkLabel = value;

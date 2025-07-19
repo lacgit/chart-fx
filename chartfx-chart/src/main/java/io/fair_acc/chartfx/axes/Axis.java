@@ -364,6 +364,13 @@ public interface Axis extends AxisDescription, Measurable.EmptyDefault {
      */
     default void updateCachedTransforms(){};
 
-    boolean getDrawTickMarkLabel();
+    /**
+     * Control whether to display the tick mark label (not the tick mark)
+     * Intended when multiple charts is synchronized on the same axis,
+     * save some space by not drawing the tick mark label.  E.g. when many
+     * different signals input with the same time axis horizontally aligned
+     * on the same pane.
+     * @param value
+     */
     void setDrawTickMarkLabel(boolean value);
 }
