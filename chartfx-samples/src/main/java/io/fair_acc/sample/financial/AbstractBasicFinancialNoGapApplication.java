@@ -18,6 +18,7 @@ import io.fair_acc.chartfx.utils.NumberFormatterImpl;
 import javafx.application.Application;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
+import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
@@ -250,6 +251,7 @@ public abstract class AbstractBasicFinancialNoGapApplication extends ChartSample
         chart.setPrefSize(prefChartWidth, prefChartHeight);
         // set them false to make the plot faster
         chart.setAnimated(false);
+        chart.getLegend().setSide(Side.TOP);
 
 
         // prepare plugins
@@ -262,10 +264,12 @@ public abstract class AbstractBasicFinancialNoGapApplication extends ChartSample
         yAxis1.setAutoRangeRounding(true);
         yAxis1.setSide(Side.RIGHT);
         yAxis1.setTickLabelFormatter(new NumberFormatterImpl());
+        yAxis1.getAxisLabel().setVisible(false);
 
         final DefaultNumericAxis yAxis2 = new DefaultNumericAxis("HS", "points");
         yAxis2.setSide(Side.RIGHT);
         yAxis2.setTickLabelFormatter(new NumberFormatterImpl());
+        yAxis2.getAxisLabel().setVisible(false);
         final ErrorDataSetRenderer errorRenderer2 = new ErrorDataSetRenderer();
         errorRenderer2.getAxes().add(yAxis2);
         errorRenderer2.getDatasets().setAll(dataSet2);
@@ -279,16 +283,20 @@ public abstract class AbstractBasicFinancialNoGapApplication extends ChartSample
         XYChart rsi = getIndicatorChart("RSI", ohlcvDataSet);
         financialAxisSynchronizer.add(chart.getXAxis());
         financialAxisSynchronizer.add(rsi.getXAxis());
+        rsi.getXAxis().setDrawTickMarkLabel(false);
+        rsi.getXAxis().getAxisLabel().setVisible(false);
+
 
         // zoom to specific time range
         if (timeRange != null) {
             showPredefinedTimeRange(timeRange, ohlcvDataSet, xAxis1, yAxis1);
         }
 
-        SplitPane    techChart = new SplitPane();
+        SplitPane   techChart = new SplitPane();
         techChart.setOrientation(Orientation.VERTICAL);
         techChart.getItems().addAll(chart, rsi);
         techChart.setDividerPosition(0, 0.75);
+
         return techChart;
     }
 
