@@ -41,6 +41,7 @@ public abstract class AbstractAxis extends AbstractAxisParameter implements Axis
     protected static final double MAX_NARROW_FONT_SCALE = 1.0;
     protected static final double MIN_TICK_GAP = 1.0;
     private final transient Canvas canvas = new ResizableCanvas();
+    private boolean drawTickMarkLabel = true;
     private boolean drawAxisLabel;
     private boolean shiftLabels;
     protected boolean labelOverlap;
@@ -844,10 +845,12 @@ public abstract class AbstractAxis extends AbstractAxisParameter implements Axis
 
             double position = tickMark.getPosition();
             double coord = isEven ? evenCoord : oddCoord;
-            if (isHorizontal) {
-                drawTickMarkLabel(gc, position, coord, scaleFont, tickMark);
-            } else {
-                drawTickMarkLabel(gc, coord, position, scaleFont, tickMark);
+            if (getDrawTickMarkLabel()) {
+                if (isHorizontal) {
+                    drawTickMarkLabel(gc, position, coord, scaleFont, tickMark);
+                } else {
+                    drawTickMarkLabel(gc, coord, position, scaleFont, tickMark);
+                }
             }
         }
 
@@ -1222,4 +1225,12 @@ public abstract class AbstractAxis extends AbstractAxisParameter implements Axis
     private DurationMeasure benchComputePrefSize = DurationMeasure.DISABLED;
     private DurationMeasure benchUpdateDirtyContent = DurationMeasure.DISABLED;
     private DurationMeasure benchDrawAxis = DurationMeasure.DISABLED;
+
+    public boolean getDrawTickMarkLabel() {
+        return  drawTickMarkLabel;
+    }
+
+    public void setDrawTickMarkLabel(boolean value) {
+        drawTickMarkLabel = value;
+    }
 }

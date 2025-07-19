@@ -363,4 +363,7 @@ public interface Axis extends AxisDescription, Measurable.EmptyDefault {
      * transformations with the modified ranges.
      */
     default void updateCachedTransforms(){};
+
+    boolean getDrawTickMarkLabel();
+    void setDrawTickMarkLabel(boolean value);
 }
