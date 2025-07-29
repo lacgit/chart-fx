@@ -283,7 +283,7 @@ public abstract class AbstractBasicFinancialNoGapApplication extends ChartSample
         XYChart rsi = getIndicatorChart("RSI", ohlcvDataSet);
         financialAxisSynchronizer.add(chart.getXAxis());
         financialAxisSynchronizer.add(rsi.getXAxis());
-        rsi.getXAxis().setDrawTickMarkLabel(false);
+        rsi.getXAxis().getTickLabelStyle().setVisible(false);
         rsi.getXAxis().getAxisLabel().setVisible(false);
 
 
