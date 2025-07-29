@@ -106,6 +106,8 @@ class SoftHashMapTests {
         assertEquals(0, countNonNullEntries(softKeyMap));
     }
 
+//    Explain reason to skip this extendedTests, as include them failed with heap overflow when mvn install
+//    reason unknown.
 //    @ParameterizedTest
 //    @Order(3)
 //    @ValueSource(classes = { SoftHashMap.class, SoftKeyHashMap.class })
