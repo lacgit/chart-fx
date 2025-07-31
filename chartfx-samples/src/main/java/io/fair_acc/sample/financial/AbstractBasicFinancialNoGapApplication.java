@@ -1,42 +1,18 @@
 package io.fair_acc.sample.financial;
 
-import static io.fair_acc.chartfx.ui.ProfilerInfoBox.DebugLevel.VERSION;
-
-import java.io.IOException;
-import java.text.ParseException;
-import java.time.ZoneOffset;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Map;
-
-import io.fair_acc.chartfx.axes.spi.format.FinancialTimeFormatter;
-import io.fair_acc.chartfx.plugins.*;
-import io.fair_acc.chartfx.renderer.spi.ContourDataSetRenderer;
-import io.fair_acc.chartfx.renderer.spi.ErrorDataSetRenderer;
-import io.fair_acc.chartfx.utils.AxisSynchronizer;
-import io.fair_acc.chartfx.utils.NumberFormatterImpl;
-import javafx.application.Application;
-import javafx.geometry.Orientation;
-import javafx.geometry.Pos;
-import javafx.scene.Group;
-import javafx.scene.Node;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
-import javafx.stage.Stage;
-
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import io.fair_acc.chartfx.Chart;
 import io.fair_acc.chartfx.XYChart;
-import io.fair_acc.chartfx.axes.AxisLabelOverlapPolicy;
 import io.fair_acc.chartfx.axes.AxisMode;
+import io.fair_acc.chartfx.axes.spi.DefaultFinancialAxis;
 import io.fair_acc.chartfx.axes.spi.DefaultNumericAxis;
+import io.fair_acc.chartfx.plugins.*;
+import io.fair_acc.chartfx.renderer.spi.ErrorDataSetRenderer;
 import io.fair_acc.chartfx.renderer.spi.financial.AbstractFinancialRenderer;
 import io.fair_acc.chartfx.renderer.spi.financial.FinancialTheme;
 import io.fair_acc.chartfx.ui.ProfilerInfoBox;
 import io.fair_acc.chartfx.ui.geometry.Side;
+import io.fair_acc.chartfx.utils.AxisSynchronizer;
+import io.fair_acc.chartfx.utils.NumberFormatterImpl;
 import io.fair_acc.dataset.spi.DefaultDataSet;
 import io.fair_acc.dataset.spi.financial.OhlcvDataSet;
 import io.fair_acc.dataset.spi.financial.api.ohlcv.IOhlcv;
@@ -45,12 +21,29 @@ import io.fair_acc.dataset.utils.ProcessingProfiler;
 import io.fair_acc.sample.chart.ChartSample;
 import io.fair_acc.sample.financial.dos.Interval;
 import io.fair_acc.sample.financial.service.CalendarUtils;
-import io.fair_acc.chartfx.axes.spi.DefaultFinancialAxis;
 import io.fair_acc.sample.financial.service.SimpleOhlcvMinuteParser;
 import io.fair_acc.sample.financial.service.SimpleOhlcvReplayDataSet;
 import io.fair_acc.sample.financial.service.SimpleOhlcvReplayDataSet.DataInput;
 import io.fair_acc.sample.financial.service.consolidate.OhlcvConsolidationAddon;
 import io.fair_acc.sample.financial.service.period.IntradayPeriod;
+import javafx.application.Application;
+import javafx.geometry.Orientation;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
+import javafx.scene.control.*;
+import javafx.scene.layout.*;
+import javafx.stage.Stage;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.text.ParseException;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Map;
+
+import static io.fair_acc.chartfx.ui.ProfilerInfoBox.DebugLevel.VERSION;
 
 /**
  * Direct adopt and modified from {@link AbstractBasicFinancialApplication}.
@@ -226,22 +219,6 @@ public abstract class AbstractBasicFinancialNoGapApplication extends ChartSample
 
         // prepare axis
         final DefaultFinancialAxis xAxis1 = new DefaultFinancialAxis("time", "iso", ohlcvDataSet);
-        xAxis1.setOverlapPolicy(AxisLabelOverlapPolicy.SKIP_ALT);
-        xAxis1.setAutoRangeRounding(false);
-        xAxis1.setTimeAxis(true);
-        xAxis1.setAxisLabelFormatter(new FinancialTimeFormatter());
-
-        // set localised time offset
-        if (xAxis1.isTimeAxis() && xAxis1.getAxisLabelFormatter() instanceof FinancialTimeFormatter) {
-            final FinancialTimeFormatter axisFormatter = (FinancialTimeFormatter) xAxis1.getAxisLabelFormatter();
-            axisFormatter.setTimeZoneOffset(ZoneOffset.ofHoursMinutes(zoneOffsetHr, 0));
-        }
-
-        // category axis support tests
-        // final CategoryAxis xAxis = new CategoryAxis("time [iso]");
-        // xAxis.setTickLabelRotation(90);
-        // xAxis.setOverlapPolicy(AxisLabelOverlapPolicy.SKIP_ALT);
-
         final DefaultNumericAxis yAxis1 = new DefaultNumericAxis("ES", "points");
 
         // prepare chart structure
@@ -411,10 +388,6 @@ public abstract class AbstractBasicFinancialNoGapApplication extends ChartSample
         DefaultFinancialAxis xAxis = new DefaultFinancialAxis("time", "iso", ohlcvDataSet);
         DefaultNumericAxis yAxis = new DefaultNumericAxis(title, "ind");
         final XYChart chart = new XYChart(xAxis, yAxis);
-        xAxis.setOverlapPolicy(AxisLabelOverlapPolicy.SKIP_ALT);
-        xAxis.setAutoRangeRounding(false);
-        xAxis.setTimeAxis(true);
-        xAxis.setAxisLabelFormatter(new FinancialTimeFormatter());
         yAxis.setSide(Side.RIGHT);
         chart.getPlugins().add(new Zoomer());
         chart.getPlugins().add(new EditAxis());

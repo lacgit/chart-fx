@@ -1,6 +1,7 @@
 package io.fair_acc.chartfx.axes.spi;
 
 import io.fair_acc.chartfx.axes.*;
+import io.fair_acc.chartfx.axes.spi.format.FinancialTimeFormatter;
 import io.fair_acc.chartfx.axes.spi.transforms.DefaultAxisTransform;
 import io.fair_acc.chartfx.axes.spi.transforms.LogarithmicAxisTransform;
 import io.fair_acc.chartfx.axes.spi.transforms.LogarithmicTimeAxisTransform;
@@ -135,9 +136,13 @@ public class DefaultFinancialAxis extends AbstractAxis implements Axis {
         if (lowerBound >= upperBound) {
             setAutoRanging(true);
         }
+        setOverlapPolicy(AxisLabelOverlapPolicy.SKIP_ALT);
+        setAutoRangeRounding(false);
+        setTimeAxis(true);
+        setAxisLabelFormatter(new FinancialTimeFormatter());
         setTickUnit(tickUnit);
-        setMinorTickCount(AbstractAxisParameter.DEFAULT_MINOR_TICK_COUNT);
-        setOverlapPolicy(AxisLabelOverlapPolicy.DO_NOTHING);
+//      too crowded
+//      setMinorTickCount(AbstractAxisParameter.DEFAULT_MINOR_TICK_COUNT);
 
         isUpdating = false;
     }
