@@ -30,6 +30,8 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
@@ -77,12 +79,19 @@ public class DynamicallyAlignedCharts extends Application {
         chart1.getRenderers().addAll(avgRenderer, errorRenderer2);
         chart1.getYAxis().setSide(Side.LEFT);
         chart2.getYAxis().setSide(Side.LEFT);
+        StackPane region1 = new StackPane();
+        StackPane region2 = new StackPane();
+        StackPane region3 = new StackPane();
+        region1.getChildren().add(chart1);
+        region2.getChildren().add(chart2);
+        chart1.setMouseTransparent(true);
+        chart2.setMouseTransparent(true);
 
         synchronizeAxes(chart1, chart2);
         alignYAxisWidths(chart1, chart2);
 
         // Layout
-        ReorderableSplitPane root = new ReorderableSplitPane(chart1, chart2);
+        ReorderableSplitPane root = new ReorderableSplitPane(region1, region2, region3);
         root.setPadding(new Insets(10));
         root.setOrientation(Orientation.VERTICAL);
         root.setDividerPositions(0.6);
