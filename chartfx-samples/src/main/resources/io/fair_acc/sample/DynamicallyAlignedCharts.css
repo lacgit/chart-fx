@@ -1,0 +1,9 @@
+.split-pane {
+    -fx-divider-position: 50%;
+}
+
+.split-pane-divider {
+    -fx-padding: 10 1 10 1; /* top right bottom left */
+    -fx-background-color: linear-gradient(to right, #aaa, #ddd, #aaa);
+    -fx-background-insets: 0;
+}

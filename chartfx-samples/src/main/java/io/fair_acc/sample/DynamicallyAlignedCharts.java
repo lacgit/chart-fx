@@ -1,7 +1,6 @@
 package io.fair_acc.sample;
 
 import io.fair_acc.chartfx.XYChart;
-import io.fair_acc.chartfx.axes.Axis;
 import io.fair_acc.chartfx.axes.AxisMode;
 import io.fair_acc.chartfx.axes.spi.DefaultFinancialAxis;
 import io.fair_acc.chartfx.axes.spi.DefaultNumericAxis;
@@ -87,6 +86,7 @@ public class DynamicallyAlignedCharts extends Application {
         root.setPadding(new Insets(10));
         root.setOrientation(Orientation.VERTICAL);
         root.setDividerPositions(0.6);
+        root.getStylesheets().add(getClass().getResource("DynamicallyAlignedCharts.css").toExternalForm());
 
         Scene scene = new Scene(root, 800, 600);
 
@@ -288,34 +288,6 @@ public class DynamicallyAlignedCharts extends Application {
                 chart.getYAxis().setMax(newVal.doubleValue());
             }
         });
-    }
-
-    private void synchronizePlotAreas(XYChart master, XYChart slave) {
-        // 1. Synchronize X-axis ranges
-        Axis masterXAxis = master.getXAxis();
-        Axis slaveXAxis = slave.getXAxis();
-
-        masterXAxis.minProperty().addListener((obs, oldVal, newVal) ->
-                slaveXAxis.setMin(newVal.doubleValue()));
-        masterXAxis.maxProperty().addListener((obs, oldVal, newVal) ->
-                slaveXAxis.setMax(newVal.doubleValue()));
-
-        // 2. Get plot areas
-        Node masterPlot = master.lookup(".chart-plot-background");
-        Node slavePlot = slave.lookup(".chart-plot-background");
-
-        if (masterPlot != null && slavePlot != null) {
-            // 3. Calculate required scale and translation
-            Bounds masterBounds = masterPlot.getBoundsInParent();
-            Bounds slaveBounds = slavePlot.getBoundsInParent();
-
-            double scaleX = masterBounds.getWidth() / slaveBounds.getWidth();
-            double translateX = masterBounds.getMinX() - (slaveBounds.getMinX() * scaleX);
-
-            // 4. Apply transformation
-            slavePlot.setScaleX(scaleX);
-            slavePlot.setTranslateX(translateX);
-        }
     }
 
     private XYChart getIndicatorChart(String title, OhlcvDataSet timeAxisDataSet, DefaultDataSet indiSet) {
